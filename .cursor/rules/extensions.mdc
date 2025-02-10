@@ -1,0 +1,99 @@
+---
+description: Creating extensions with tiptap
+globs: 
+---
+
+## Key Requirements
+1. Use named exports (not default exports)
+2. Extensions must be registered in:
+   - `src/extensions/index.ts` for export
+   - `src/extensions/extension-kit.ts` for usage
+   - `src/extensions/SlashCommand/groups.ts` for slash menu integration
+
+## Extension Development Steps
+1. Create extension directory with proper structure
+2. Define extension in main .ts file:
+   ```typescript
+   export const ExtensionName = Node.create({
+     name: 'extensionName',
+     group: 'block',
+     draggable: true,
+     // ... other configuration
+   })
+   ```
+
+3. Add commands interface:
+   ```typescript
+   declare module '@tiptap/core' {
+     interface Commands<ReturnType> {
+       extensionName: {
+         setExtensionName: () => ReturnType
+       }
+     }
+   }
+   ```
+
+4. If using React components, create view:
+   ```typescript
+   export const ExtensionView = () => {
+     return (
+       <NodeViewWrapper data-drag-handle>
+         <Panel noShadow className="w-full">
+           // ... component content
+         </Panel>
+       </NodeViewWrapper>
+     )
+   }
+   ```
+
+5. Add to slash menu in `groups.ts`:
+   ```typescript
+   {
+     name: 'extensionName',
+     label: 'Extension Label',
+     iconName: 'IconName',
+     description: 'Description',
+     aliases: ['alias'],
+     action: editor => {
+       editor.chain().focus().setExtensionName().run()
+     },
+   }
+   ```
+
+## Common Components
+- Use `Panel` from '@/components/ui/Panel' for container styling
+- Use `NodeViewWrapper` from '@tiptap/react' for node views
+- Add `data-drag-handle` for draggable blocks
+
+## Best Practices
+1. Always use named exports
+2. Follow existing extension patterns
+3. Place extension in correct group in slash menu
+4. Use consistent naming conventions
+5. Include proper TypeScript types
+6. Add extension to extension-kit.ts near similar extensions
+
+## Reference Files
+Use @ to reference existing files:
+- @templates/next-block-editor-app/src/extensions/HelloWorld/HelloWorld.ts
+- @templates/next-block-editor-app/src/extensions/HorizontalRule/HorizontalRule.ts
+- @templates/next-block-editor-app/src/extensions/SlashCommand/groups.ts
+
+## Common Gotchas
+1. Extension not appearing in slash menu? Check:
+   - Named exports in all files
+   - Registration in extension-kit.ts
+   - Addition to correct group in groups.ts
+
+2. Extension not working? Verify:
+   - Command interface declaration
+   - Proper extension registration
+   - Correct component structure
+
+## Testing Extensions
+1. Extension should appear in slash menu
+2. Dragging should work if draggable: true
+3. Commands should work via slash menu and programmatically
+4. Component should render correctly
+5. Extension should work with undo/redo
+
