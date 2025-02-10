@@ -2,6 +2,7 @@ import { NodeViewWrapper, NodeViewProps } from '@tiptap/react'
 import { Panel } from '@/components/ui/Panel'
 import { Bot } from 'lucide-react'
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { Spinner } from '@/components/ui/Spinner'
 
 export const MetaView = ({ editor, getPos }: NodeViewProps) => {
   const [value, setValue] = useState('')
@@ -150,7 +151,7 @@ export const MetaView = ({ editor, getPos }: NodeViewProps) => {
       <Panel noShadow className="w-full">
         <div className={`relative p-4 rounded-lg transition-colors duration-150 ${isLoading ? 'bg-[#f0f7ff]' : ''}`}>
           <div className="absolute top-4 left-4">
-            <Bot className={`w-5 h-5 ${isLoading ? 'text-blue-500 animate-pulse' : 'text-gray-500'}`} />
+            {isLoading ? <Spinner className="w-5 h-5 text-blue-500" /> : <Bot className="w-5 h-5 text-gray-500" />}
           </div>
           <div className="pl-8">
             <input
