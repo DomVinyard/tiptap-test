@@ -13,7 +13,7 @@ import '@fontsource/inter/700.css'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://demos.tiptap.dev'),
-  title: 'Tiptap block editor template',
+  title: 'Wordware',
   description:
     'Tiptap is a suite of open source content editing and real-time collaboration tools for developers building apps like Notion or Google Docs.',
   robots: 'noindex, nofollow',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     creator: '@tiptap_editor',
   },
   openGraph: {
-    title: 'Tiptap block editor template',
+    title: 'Wordware',
     description:
       'Tiptap is a suite of open source content editing and real-time collaboration tools for developers building apps like Notion or Google Docs.',
   },

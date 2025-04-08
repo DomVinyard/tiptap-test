@@ -17,18 +17,24 @@ import { TextMenu } from '../menus/TextMenu'
 import { ContentItemMenu } from '../menus/ContentItemMenu'
 import * as Y from 'yjs'
 import { TiptapCollabProvider } from '@hocuspocus/provider'
+import { Icon } from '@/components/ui/Icon'
 
-const InputTag = ({ label }: { label: string }) => (
-  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-lg text-sm">
+const InputTag = ({ label, onClick, isSelected }: { label: string; onClick: () => void; isSelected: boolean }) => (
+  <div 
+    onClick={onClick}
+    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer ${
+      isSelected ? 'bg-emerald-100 dark:bg-emerald-900' : 'bg-emerald-50 dark:bg-emerald-950'
+    }`}
+  >
     <span className="text-xs text-emerald-500 font-medium">abc</span>
-    <span className="text-gray-900">{label}</span>
+    <span className="text-gray-900 dark:text-gray-100">{label}</span>
   </div>
 )
 
-const NewInputButton = () => (
-  <button className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50">
-    <span className="text-gray-600">+</span>
-    <span className="text-gray-900">New Input</span>
+const AddInputButton = () => (
+  <button className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm border border-dashed border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+    <Icon name="Plus" className="w-4 h-4 mr-1" />
+    Add input
   </button>
 )
 
@@ -42,6 +48,7 @@ export const BlockEditor = ({
   provider?: TiptapCollabProvider | null | undefined
 }) => {
   const [isEditable, setIsEditable] = useState(true)
+  const [selectedInput, setSelectedInput] = useState<string | null>(null)
   const menuContainerRef = useRef(null)
 
   const { editor, users, collabState } = useBlockEditor({
@@ -52,6 +59,22 @@ export const BlockEditor = ({
       setIsEditable(currentEditor.isEditable)
     },
   })
+
+  // Handle clicks outside of input tags
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // Check if the click is outside of input tags
+      if (!target.closest('.input-tags-container')) {
+        setSelectedInput(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   if (!editor || !users) {
     return null
@@ -69,11 +92,21 @@ export const BlockEditor = ({
         <div className="flex-1 overflow-y-auto bg-neutral-100">
           <div className="max-w-4xl mx-auto mt-8">
             <div className="mb-8">
-              <h2 className="text-gray-500 mb-4 text-sm font-medium">INPUTS</h2>
-              <div className="flex gap-2 items-center">
-                <InputTag label="topic" />
-                <InputTag label="style" />
-                <NewInputButton />
+              <div className="flex items-center gap-4">
+                <h2 className="text-gray-500 text-sm font-medium">INPUTS</h2>
+                <div className="flex gap-2 items-center input-tags-container">
+                  <InputTag 
+                    label="topic" 
+                    onClick={() => setSelectedInput('topic')}
+                    isSelected={selectedInput === 'topic'}
+                  />
+                  <InputTag 
+                    label="style" 
+                    onClick={() => setSelectedInput('style')}
+                    isSelected={selectedInput === 'style'}
+                  />
+                  <AddInputButton />
+                </div>
               </div>
             </div>
             <div className="bg-white shadow-sm">
@@ -99,7 +132,7 @@ export const BlockEditor = ({
           </div>
         </div>
       </div>
-      <RightSidebar />
+      <RightSidebar selectedInput={selectedInput} />
     </div>
   )
 }
