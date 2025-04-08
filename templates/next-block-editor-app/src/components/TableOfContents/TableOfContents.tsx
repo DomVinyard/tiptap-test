@@ -23,7 +23,7 @@ export const TableOfContents = memo(({ editor, onItemClick }: TableOfContentsPro
   return (
     <>
       <div className="mb-2 text-xs font-semibold uppercase text-neutral-500 dark:text-neutral-400">
-        Table of contents
+        Your Flows
       </div>
       {content.length > 0 ? (
         <div className="flex flex-col gap-1">
@@ -38,7 +38,7 @@ export const TableOfContents = memo(({ editor, onItemClick }: TableOfContentsPro
                 item.isActive && 'text-neutral-800 bg-neutral-100 dark:text-neutral-100 dark:bg-neutral-900',
               )}
             >
-              {item.itemIndex}. {item.textContent}
+              {item.textContent}
             </a>
           ))}
         </div>

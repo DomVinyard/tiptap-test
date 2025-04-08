@@ -24,4 +24,4 @@ export const EditorHeader = ({ editor }: EditorHeaderProps) => {
       </div>
     </div>
   )
-}
+} 

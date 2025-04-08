@@ -17,7 +17,7 @@
 
   /* Default Placeholder */
   & > .is-editor-empty:first-child:last-child::before {
-    content: 'Click here to start writing …';
+    content: 'Continue flow or press run…';
   }
 
   /* Blockquote Placeholder */

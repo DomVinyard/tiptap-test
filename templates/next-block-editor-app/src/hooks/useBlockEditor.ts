@@ -97,7 +97,7 @@ export const useBlockEditor = ({
           autocomplete: 'off',
           autocorrect: 'off',
           autocapitalize: 'off',
-          class: 'min-h-full',
+          class: '[&_*]:outline-none py-16',
         },
       },
     },
