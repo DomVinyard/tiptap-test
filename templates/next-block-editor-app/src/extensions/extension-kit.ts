@@ -151,6 +151,10 @@ export const ExtensionKit = ({ provider }: ExtensionKitProps) => {
     TaskList,
     HelloWorld,
     GoodbyeWorld,
+    Meta,
+    ImageUpload.configure({
+      clientId: provider?.document?.clientID,
+    }),
   ]
 }
 
