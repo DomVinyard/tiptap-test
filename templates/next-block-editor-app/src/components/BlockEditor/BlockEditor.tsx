@@ -1,5 +1,5 @@
 import { EditorContent } from '@tiptap/react'
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useCallback } from 'react'
 
 import { LinkMenu } from '@/components/menus'
 import { useBlockEditor } from '@/hooks/useBlockEditor'
@@ -10,7 +10,6 @@ import { RightSidebar } from '@/components/Sidebar/RightSidebar'
 import ImageBlockMenu from '@/extensions/ImageBlock/components/ImageBlockMenu'
 import { ColumnsMenu } from '@/extensions/MultiColumn/menus'
 import { TableColumnMenu, TableRowMenu } from '@/extensions/Table/menus'
-import { EditorHeader } from './components/EditorHeader'
 import { ModelPicker } from './components/ModelPicker'
 import { FlowRunner } from './components/FlowRunner'
 import { TextMenu } from '../menus/TextMenu'
@@ -22,8 +21,8 @@ import { Icon } from '@/components/ui/Icon'
 const InputTag = ({ label, onClick, isSelected }: { label: string; onClick: () => void; isSelected: boolean }) => (
   <div 
     onClick={onClick}
-    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer ${
-      isSelected ? 'bg-emerald-100 dark:bg-emerald-900' : 'bg-emerald-50 dark:bg-emerald-950'
+    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer bg-emerald-50 dark:bg-emerald-950 ${
+      isSelected ? 'ring-2 ring-blue-500' : ''
     }`}
   >
     <span className="text-xs text-emerald-500 font-medium">abc</span>
@@ -49,6 +48,8 @@ export const BlockEditor = ({
 }) => {
   const [isEditable, setIsEditable] = useState(true)
   const [selectedInput, setSelectedInput] = useState<string | null>(null)
+  const [selectedModel, setSelectedModel] = useState(false)
+  const [hasContent, setHasContent] = useState(false)
   const menuContainerRef = useRef(null)
 
   const { editor, users, collabState } = useBlockEditor({
@@ -57,16 +58,18 @@ export const BlockEditor = ({
     provider,
     onTransaction({ editor: currentEditor }) {
       setIsEditable(currentEditor.isEditable)
+      setHasContent(!currentEditor.isEmpty)
     },
   })
 
-  // Handle clicks outside of input tags
+  // Handle clicks outside of input tags and model selector
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      // Check if the click is outside of input tags
-      if (!target.closest('.input-tags-container')) {
+      // Check if the click is outside of input tags and model selector
+      if (!target.closest('.input-tags-container') && !target.closest('.model-selector')) {
         setSelectedInput(null);
+        setSelectedModel(false);
       }
     };
 
@@ -76,37 +79,49 @@ export const BlockEditor = ({
     };
   }, []);
 
+  const handleModelSelect = useCallback((isSelected: boolean) => {
+    setSelectedModel(isSelected);
+    if (isSelected) {
+      setSelectedInput(null);
+    }
+  }, []);
+
   if (!editor || !users) {
     return null
   }
 
   return (
-    <div className="flex h-screen bg-neutral-100" ref={menuContainerRef}>
+    <div className="flex h-screen overflow-hidden bg-neutral-100" ref={menuContainerRef}>
       <Sidebar editor={editor} />
-      <div className="relative flex flex-col flex-1 h-screen overflow-hidden">
-        <EditorHeader
-          editor={editor}
-          collabState={collabState}
-          users={users}
-        />
+      <div className="relative flex flex-col flex-1">
         <div className="flex-1 overflow-y-auto bg-neutral-100">
           <div className="max-w-4xl mx-auto mt-8">
-            <div className="mb-8">
-              <div className="flex items-center gap-4">
-                <h2 className="text-gray-500 text-sm font-medium">INPUTS</h2>
-                <div className="flex gap-2 items-center input-tags-container">
-                  <InputTag 
-                    label="topic" 
-                    onClick={() => setSelectedInput('topic')}
-                    isSelected={selectedInput === 'topic'}
-                  />
-                  <InputTag 
-                    label="style" 
-                    onClick={() => setSelectedInput('style')}
-                    isSelected={selectedInput === 'style'}
-                  />
-                  <AddInputButton />
+            <div className="bg-white dark:bg-black shadow-sm rounded-t-lg">
+              <div className="px-20 pt-12">
+                <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">My App</h1>
+                <p className="text-gray-500 dark:text-gray-400 mb-6">This is a short description of the app</p>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="flex gap-2 items-center input-tags-container">
+                    <InputTag 
+                      label="input_1" 
+                      onClick={() => {
+                        setSelectedInput('input_1');
+                        setSelectedModel(false);
+                      }}
+                      isSelected={selectedInput === 'input_1'}
+                    />
+                    <InputTag 
+                      label="input_2" 
+                      onClick={() => {
+                        setSelectedInput('input_2');
+                        setSelectedModel(false);
+                      }}
+                      isSelected={selectedInput === 'input_2'}
+                    />
+                    <AddInputButton />
+                  </div>
                 </div>
+                <hr className="border-neutral-200 dark:border-neutral-800" />
               </div>
             </div>
             <div className="bg-white shadow-sm">
@@ -114,9 +129,11 @@ export const BlockEditor = ({
                 <EditorContent className="p-0" editor={editor} />
               </div>
             </div>
-            <div className="mt-4">
-              <ModelPicker />
-            </div>
+            {hasContent && (
+              <div className="mt-4 model-selector">
+                <ModelPicker onSelect={handleModelSelect} isModelSelected={selectedModel} />
+              </div>
+            )}
           </div>
         </div>
         <ContentItemMenu editor={editor} isEditable={isEditable} />
@@ -127,12 +144,12 @@ export const BlockEditor = ({
         <TableColumnMenu editor={editor} appendTo={menuContainerRef} />
         <ImageBlockMenu editor={editor} appendTo={menuContainerRef} />
         <div className="flex-none bg-white border-t border-neutral-200 dark:bg-black dark:border-neutral-800">
-          <div className="max-w-4xl mx-auto w-full">
+          <div className="max-w-4xl mx-auto w-full py-2">
             <FlowRunner />
           </div>
         </div>
       </div>
-      <RightSidebar selectedInput={selectedInput} />
+      <RightSidebar selectedInput={selectedInput} selectedModel={selectedModel} />
     </div>
   )
 }

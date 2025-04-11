@@ -5,7 +5,11 @@ import { Surface } from '@/components/ui/Surface'
 import { useCallback, useState } from 'react'
 import { ModelPicker } from './ModelPicker'
 
-export const FlowEditor = () => {
+type FlowEditorProps = {
+  isFirst?: boolean
+}
+
+export const FlowEditor = ({ isFirst = false }: FlowEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -32,7 +36,7 @@ export const FlowEditor = () => {
   return (
     <div className="w-full max-w-4xl mx-auto">
       <Surface className="w-full">
-        <div className="w-full [&_*]:outline-none">
+        <div className={`w-full [&_*]:outline-none ${isFirst ? 'first-editor' : 'subsequent-editor'}`}>
           <EditorContent className="w-full" editor={editor} />
         </div>
       </Surface>

@@ -17,7 +17,11 @@
 
   /* Default Placeholder */
   & > .is-editor-empty:first-child:last-child::before {
-    content: 'Continue flow or press run…';
+    content: 'Start writing your prompt...';
+  }
+
+  .subsequent-editor & > .is-editor-empty:first-child:last-child::before {
+    content: 'Continue your app here or press "Run"...';
   }
 
   /* Blockquote Placeholder */
