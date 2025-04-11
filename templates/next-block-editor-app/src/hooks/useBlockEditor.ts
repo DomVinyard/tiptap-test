@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useEditor, useEditorState } from '@tiptap/react'
-import type { AnyExtension, Editor, EditorOptions } from '@tiptap/core'
+import type { AnyExtension, Editor, EditorOptions, Range } from '@tiptap/core'
 import Collaboration from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import { TiptapCollabProvider, WebSocketStatus } from '@hocuspocus/provider'
@@ -11,8 +11,6 @@ import { userColors, userNames } from '../lib/constants'
 import { randomElement } from '../lib/utils'
 import type { EditorUser } from '../components/BlockEditor/types'
 import { initialContent } from '@/lib/data/initialContent'
-import { Ai } from '@/extensions/Ai'
-import { AiImage, AiWriter } from '@/extensions'
 import { HelloWorld } from '@/extensions/HelloWorld'
 
 declare global {
@@ -22,14 +20,12 @@ declare global {
 }
 
 export const useBlockEditor = ({
-  aiToken,
   ydoc,
   provider,
   userId,
   userName = 'Maxi',
   ...editorOptions
 }: {
-  aiToken?: string
   ydoc: YDoc | null
   provider?: TiptapCollabProvider | null | undefined
   userId?: string
@@ -77,19 +73,6 @@ export const useBlockEditor = ({
               },
             })
           : undefined,
-        // aiToken
-        //   ? AiWriter.configure({
-        //       authorId: userId,
-        //       authorName: userName,
-        //     })
-        //   : undefined,
-        // aiToken
-        //   ? AiImage.configure({
-        //       authorId: userId,
-        //       authorName: userName,
-        //     })
-        //   : undefined,
-        // aiToken ? Ai.configure({ token: aiToken }) : undefined,
         HelloWorld,
       ].filter((e): e is AnyExtension => e !== undefined),
       editorProps: {
@@ -133,7 +116,7 @@ export const useBlockEditor = ({
     {
       title: 'Hello World',
       description: 'Insert a Hello World block',
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: { editor: Editor; range: Range }) => {
         editor.chain().focus().deleteRange(range).setHelloWorld().run()
       },
       icon: 'Wave',

@@ -1,236 +1,163 @@
-import { Icon } from '@/components/ui/Icon'
-import { Toolbar } from '@/components/ui/Toolbar'
-import { useTextmenuCommands } from './hooks/useTextmenuCommands'
-import { useTextmenuStates } from './hooks/useTextmenuStates'
-import { BubbleMenu, Editor } from '@tiptap/react'
-import { memo, useEffect, useState } from 'react'
-import * as Popover from '@radix-ui/react-popover'
+import { useCallback } from 'react'
+import { Editor } from '@tiptap/core'
+import { BubbleMenu } from '@tiptap/react'
+
 import { Surface } from '@/components/ui/Surface'
+import { Toolbar } from '@/components/ui/Toolbar'
+import { Icon } from '@/components/ui/Icon'
 import { ColorPicker } from '@/components/panels'
-import { FontFamilyPicker } from './components/FontFamilyPicker'
-import { FontSizePicker } from './components/FontSizePicker'
-import { useTextmenuContentTypes } from './hooks/useTextmenuContentTypes'
-import { ContentTypePicker } from './components/ContentTypePicker'
-import { AIDropdown } from './components/AIDropdown'
-import { EditLinkPopover } from './components/EditLinkPopover'
+import { useTextmenuCommands } from './hooks/useTextmenuCommands'
 
-// We memorize the button so each button is not rerendered
-// on every editor state change
-const MemoButton = memo(Toolbar.Button)
-const MemoColorPicker = memo(ColorPicker)
-const MemoFontFamilyPicker = memo(FontFamilyPicker)
-const MemoFontSizePicker = memo(FontSizePicker)
-const MemoContentTypePicker = memo(ContentTypePicker)
-
-export type TextMenuProps = {
+export interface TextMenuProps {
   editor: Editor
 }
 
 export const TextMenu = ({ editor }: TextMenuProps) => {
-  const [selecting, setSelecting] = useState(false)
-  const commands = useTextmenuCommands(editor)
-  const states = useTextmenuStates(editor)
-  const blockOptions = useTextmenuContentTypes(editor)
+  const {
+    onBold,
+    onItalic,
+    onStrike,
+    onUnderline,
+    onCode,
+    onCodeBlock,
+    onSubscript,
+    onSuperscript,
+    onAlignLeft,
+    onAlignCenter,
+    onAlignRight,
+    onAlignJustify,
+    onChangeColor,
+    onClearColor,
+    onChangeHighlight,
+    onClearHighlight,
+  } = useTextmenuCommands(editor)
 
-  useEffect(() => {
-    const controller = new AbortController()
-    let selectionTimeout: number
+  const handleColorChange = useCallback(
+    (color: string) => {
+      onChangeColor(color)
+    },
+    [onChangeColor],
+  )
 
-    document.addEventListener(
-      'selectionchange',
-      () => {
-        setSelecting(true)
-
-        if (selectionTimeout) {
-          window.clearTimeout(selectionTimeout)
-        }
-
-        selectionTimeout = window.setTimeout(() => {
-          setSelecting(false)
-        }, 500)
-      },
-      { signal: controller.signal },
-    )
-
-    return () => {
-      controller.abort()
-    }
-  }, [])
+  const handleHighlightChange = useCallback(
+    (color: string) => {
+      onChangeHighlight(color)
+    },
+    [onChangeHighlight],
+  )
 
   return (
-    <BubbleMenu
-      className={selecting ? 'hidden' : ''}
-      tippyOptions={{
-        popperOptions: {
-          placement: 'top-start',
-          modifiers: [
-            {
-              name: 'preventOverflow',
-              options: {
-                boundary: 'viewport',
-                padding: 8,
-              },
-            },
-            {
-              name: 'flip',
-              options: {
-                fallbackPlacements: ['bottom-start', 'top-end', 'bottom-end'],
-              },
-            },
-          ],
-        },
-        offset: [0, 8],
-        maxWidth: 'calc(100vw - 16px)',
-      }}
-      editor={editor}
-      pluginKey="textMenu"
-      shouldShow={states.shouldShow}
-      updateDelay={0}
-    >
-      <Toolbar.Wrapper>
-        <AIDropdown
-          onCompleteSentence={commands.onCompleteSentence}
-          onEmojify={commands.onEmojify}
-          onFixSpelling={commands.onFixSpelling}
-          onMakeLonger={commands.onMakeLonger}
-          onMakeShorter={commands.onMakeShorter}
-          onSimplify={commands.onSimplify}
-          onTldr={commands.onTldr}
-          onTone={commands.onTone}
-          onTranslate={commands.onTranslate}
-        />
-        <Toolbar.Divider />
-        <MemoContentTypePicker options={blockOptions} />
-        <MemoFontFamilyPicker onChange={commands.onSetFont} value={states.currentFont || ''} />
-        <MemoFontSizePicker onChange={commands.onSetFontSize} value={states.currentSize || ''} />
-        <Toolbar.Divider />
-        <MemoButton tooltip="Bold" tooltipShortcut={['Mod', 'B']} onClick={commands.onBold} active={states.isBold}>
-          <Icon name="Bold" />
-        </MemoButton>
-        <MemoButton
-          tooltip="Italic"
-          tooltipShortcut={['Mod', 'I']}
-          onClick={commands.onItalic}
-          active={states.isItalic}
-        >
-          <Icon name="Italic" />
-        </MemoButton>
-        <MemoButton
-          tooltip="Underline"
-          tooltipShortcut={['Mod', 'U']}
-          onClick={commands.onUnderline}
-          active={states.isUnderline}
-        >
-          <Icon name="Underline" />
-        </MemoButton>
-        <MemoButton
-          tooltip="Strikehrough"
-          tooltipShortcut={['Mod', 'Shift', 'S']}
-          onClick={commands.onStrike}
-          active={states.isStrike}
-        >
-          <Icon name="Strikethrough" />
-        </MemoButton>
-        <MemoButton tooltip="Code" tooltipShortcut={['Mod', 'E']} onClick={commands.onCode} active={states.isCode}>
-          <Icon name="Code" />
-        </MemoButton>
-        <MemoButton tooltip="Code block" onClick={commands.onCodeBlock}>
-          <Icon name="FileCode" />
-        </MemoButton>
-        <EditLinkPopover onSetLink={commands.onLink} />
-        <Popover.Root>
-          <Popover.Trigger asChild>
-            <MemoButton active={!!states.currentHighlight} tooltip="Highlight text">
-              <Icon name="Highlighter" />
-            </MemoButton>
-          </Popover.Trigger>
-          <Popover.Content side="top" sideOffset={8} asChild>
-            <Surface className="p-1">
-              <MemoColorPicker
-                color={states.currentHighlight}
-                onChange={commands.onChangeHighlight}
-                onClear={commands.onClearHighlight}
-              />
-            </Surface>
-          </Popover.Content>
-        </Popover.Root>
-        <Popover.Root>
-          <Popover.Trigger asChild>
-            <MemoButton active={!!states.currentColor} tooltip="Text color">
-              <Icon name="Palette" />
-            </MemoButton>
-          </Popover.Trigger>
-          <Popover.Content side="top" sideOffset={8} asChild>
-            <Surface className="p-1">
-              <MemoColorPicker
-                color={states.currentColor}
-                onChange={commands.onChangeColor}
-                onClear={commands.onClearColor}
-              />
-            </Surface>
-          </Popover.Content>
-        </Popover.Root>
-        <Popover.Root>
-          <Popover.Trigger asChild>
-            <MemoButton tooltip="More options">
-              <Icon name="EllipsisVertical" />
-            </MemoButton>
-          </Popover.Trigger>
-          <Popover.Content side="top" asChild>
-            <Toolbar.Wrapper>
-              <MemoButton
-                tooltip="Subscript"
-                tooltipShortcut={['Mod', '.']}
-                onClick={commands.onSubscript}
-                active={states.isSubscript}
-              >
-                <Icon name="Subscript" />
-              </MemoButton>
-              <MemoButton
-                tooltip="Superscript"
-                tooltipShortcut={['Mod', ',']}
-                onClick={commands.onSuperscript}
-                active={states.isSuperscript}
-              >
-                <Icon name="Superscript" />
-              </MemoButton>
-              <Toolbar.Divider />
-              <MemoButton
-                tooltip="Align left"
-                tooltipShortcut={['Shift', 'Mod', 'L']}
-                onClick={commands.onAlignLeft}
-                active={states.isAlignLeft}
-              >
-                <Icon name="AlignLeft" />
-              </MemoButton>
-              <MemoButton
-                tooltip="Align center"
-                tooltipShortcut={['Shift', 'Mod', 'E']}
-                onClick={commands.onAlignCenter}
-                active={states.isAlignCenter}
-              >
-                <Icon name="AlignCenter" />
-              </MemoButton>
-              <MemoButton
-                tooltip="Align right"
-                tooltipShortcut={['Shift', 'Mod', 'R']}
-                onClick={commands.onAlignRight}
-                active={states.isAlignRight}
-              >
-                <Icon name="AlignRight" />
-              </MemoButton>
-              <MemoButton
-                tooltip="Justify"
-                tooltipShortcut={['Shift', 'Mod', 'J']}
-                onClick={commands.onAlignJustify}
-                active={states.isAlignJustify}
-              >
-                <Icon name="AlignJustify" />
-              </MemoButton>
-            </Toolbar.Wrapper>
-          </Popover.Content>
-        </Popover.Root>
-      </Toolbar.Wrapper>
+    <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
+      <Surface className="p-1">
+        <Toolbar.Wrapper>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onBold}
+            active={editor.isActive('bold')}
+            tooltip="Bold"
+          >
+            <Icon name="Bold" className="h-4 w-4" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onItalic}
+            active={editor.isActive('italic')}
+            tooltip="Italic"
+          >
+            <Icon name="Italic" className="h-4 w-4" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onStrike}
+            active={editor.isActive('strike')}
+            tooltip="Strike"
+          >
+            <Icon name="Strikethrough" className="h-4 w-4" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onUnderline}
+            active={editor.isActive('underline')}
+            tooltip="Underline"
+          >
+            <Icon name="Underline" className="h-4 w-4" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onCode}
+            active={editor.isActive('code')}
+            tooltip="Code"
+          >
+            <Icon name="Code" className="h-4 w-4" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onCodeBlock}
+            active={editor.isActive('codeBlock')}
+            tooltip="Code Block"
+          >
+            <Icon name="Code" className="h-4 w-4" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onSubscript}
+            active={editor.isActive('subscript')}
+            tooltip="Subscript"
+          >
+            <Icon name="Subscript" className="h-4 w-4" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onSuperscript}
+            active={editor.isActive('superscript')}
+            tooltip="Superscript"
+          >
+            <Icon name="Superscript" className="h-4 w-4" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onAlignLeft}
+            active={editor.isActive({ textAlign: 'left' })}
+            tooltip="Align Left"
+          >
+            <Icon name="AlignLeft" className="h-4 w-4" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onAlignCenter}
+            active={editor.isActive({ textAlign: 'center' })}
+            tooltip="Align Center"
+          >
+            <Icon name="AlignCenter" className="h-4 w-4" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onAlignRight}
+            active={editor.isActive({ textAlign: 'right' })}
+            tooltip="Align Right"
+          >
+            <Icon name="AlignRight" className="h-4 w-4" />
+          </Toolbar.Button>
+          <Toolbar.Button
+            variant="ghost"
+            onClick={onAlignJustify}
+            active={editor.isActive({ textAlign: 'justify' })}
+            tooltip="Align Justify"
+          >
+            <Icon name="AlignJustify" className="h-4 w-4" />
+          </Toolbar.Button>
+          <ColorPicker
+            color={editor.getAttributes('textStyle').color}
+            onChange={handleColorChange}
+            onClear={onClearColor}
+          />
+          <ColorPicker
+            color={editor.getAttributes('highlight').color}
+            onChange={handleHighlightChange}
+            onClear={onClearHighlight}
+          />
+        </Toolbar.Wrapper>
+      </Surface>
     </BubbleMenu>
   )
 }

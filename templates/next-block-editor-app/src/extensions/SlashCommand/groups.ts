@@ -2,28 +2,6 @@ import { Group } from './types'
 
 export const GROUPS: Group[] = [
   {
-    name: 'ai',
-    title: 'AI',
-    commands: [
-      {
-        name: 'aiWriter',
-        label: 'AI Writer',
-        iconName: 'Sparkles',
-        description: 'Let AI finish your thoughts',
-        shouldBeHidden: editor => editor.isActive('columns'),
-        action: editor => editor.chain().focus().setAiWriter().run(),
-      },
-      {
-        name: 'aiImage',
-        label: 'AI Image',
-        iconName: 'Sparkles',
-        description: 'Generate an image from text',
-        shouldBeHidden: editor => editor.isActive('columns'),
-        action: editor => editor.chain().focus().setAiImage().run(),
-      },
-    ],
-  },
-  {
     name: 'format',
     title: 'Format',
     commands: [
@@ -80,7 +58,7 @@ export const GROUPS: Group[] = [
       {
         name: 'taskList',
         label: 'Task List',
-        iconName: 'CheckSquare',
+        iconName: 'Check',
         description: 'List with checkboxes',
         aliases: ['todo'],
         action: editor => {
@@ -90,7 +68,7 @@ export const GROUPS: Group[] = [
       {
         name: 'codeBlock',
         label: 'Code Block',
-        iconName: 'Code2',
+        iconName: 'Code',
         description: 'Code with syntax highlighting',
         aliases: ['code'],
         action: editor => {
@@ -116,7 +94,7 @@ export const GROUPS: Group[] = [
       {
         name: 'columns',
         label: 'Columns',
-        iconName: 'Columns',
+        iconName: 'Columns2',
         description: 'Add two columns side by side',
         aliases: ['cols'],
         action: editor => {

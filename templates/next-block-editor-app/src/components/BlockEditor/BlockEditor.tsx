@@ -12,7 +12,6 @@ import { ColumnsMenu } from '@/extensions/MultiColumn/menus'
 import { TableColumnMenu, TableRowMenu } from '@/extensions/Table/menus'
 import { ModelPicker } from './components/ModelPicker'
 import { FlowRunner } from './components/FlowRunner'
-import { TextMenu } from '../menus/TextMenu'
 import { ContentItemMenu } from '../menus/ContentItemMenu'
 import * as Y from 'yjs'
 import { TiptapCollabProvider } from '@hocuspocus/provider'
@@ -38,11 +37,9 @@ const AddInputButton = () => (
 )
 
 export const BlockEditor = ({
-  aiToken,
   ydoc,
   provider,
 }: {
-  aiToken?: string
   ydoc: Y.Doc | null
   provider?: TiptapCollabProvider | null | undefined
 }) => {
@@ -53,7 +50,6 @@ export const BlockEditor = ({
   const menuContainerRef = useRef(null)
 
   const { editor, users, collabState } = useBlockEditor({
-    aiToken,
     ydoc,
     provider,
     onTransaction({ editor: currentEditor }) {
@@ -137,7 +133,6 @@ export const BlockEditor = ({
           </div>
         </div>
         <LinkMenu editor={editor} appendTo={menuContainerRef} />
-        <TextMenu editor={editor} />
         <ColumnsMenu editor={editor} appendTo={menuContainerRef} />
         <TableRowMenu editor={editor} appendTo={menuContainerRef} />
         <TableColumnMenu editor={editor} appendTo={menuContainerRef} />
