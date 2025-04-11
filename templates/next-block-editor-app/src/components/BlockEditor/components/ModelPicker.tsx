@@ -47,17 +47,17 @@ export const ModelPicker = ({ isSecondary = false, onSelect, isModelSelected = f
   return (
     <>
       <Surface 
-        className={`!bg-gradient-to-br from-neutral-200 via-neutral-200 to-neutral-300 dark:from-neutral-800 dark:via-neutral-800 dark:to-neutral-700 flex items-center justify-between p-4 my-4 max-w-4xl mx-auto border-0 shadow-xl shadow-black/10 dark:shadow-white/5 transition-all ${selectedModel && isSelected ? 'ring-2 ring-blue-500' : ''} ${selectedModel ? 'cursor-pointer' : ''}`}
+        className={`!bg-gradient-to-br from-neutral-200 via-neutral-200 to-neutral-300 dark:from-neutral-800 dark:via-neutral-800 dark:to-neutral-700 flex items-center justify-between p-4 max-w-4xl mx-auto border-0 shadow-xl shadow-black/10 dark:shadow-white/5 transition-all mb-4 ${!isSecondary ? '!rounded-tl-none !rounded-tr-none' : ''} ${selectedModel && isSelected ? 'ring-2 ring-blue-500' : ''} ${selectedModel ? 'cursor-pointer' : ''}`}
         withBorder={false}
         onClick={handleClick}
       >
         <Dropdown.Root>
           <Dropdown.Trigger asChild>
             <button className="flex items-center gap-3 group">
-              <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-neutral-900 to-neutral-700 dark:from-neutral-600 dark:to-neutral-400 transition-all ml-3.5">
+              <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-neutral-900 to-neutral-700 dark:from-neutral-600 dark:to-neutral-400 transition-all ml-14">
                 <Icon name="Sparkles" className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="text-neutral-500 ml-2">{selectedModel ? models.find(m => m.id === selectedModel)?.name : 'Select AI model to run'}</span>
+              <span className="text-neutral-500 ml-0  !text-sm">{selectedModel ? models.find(m => m.id === selectedModel)?.name : 'Select AI model to run'}</span>
               <Icon name="ChevronDown" className="w-4 h-4 text-neutral-500" />
             </button>
           </Dropdown.Trigger>

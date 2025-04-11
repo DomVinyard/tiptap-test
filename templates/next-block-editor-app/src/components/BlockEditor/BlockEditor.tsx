@@ -126,7 +126,7 @@ export const BlockEditor = ({
               </div>
             </div>
             {hasContent && (
-              <div className="mt-4 model-selector">
+              <div className="model-selector">
                 <ModelPicker onSelect={handleModelSelect} isModelSelected={selectedModel} />
               </div>
             )}

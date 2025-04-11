@@ -35,14 +35,14 @@ export const FlowEditor = ({ isFirst = false }: FlowEditorProps) => {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <Surface className="w-full">
+      <Surface className={`w-full ${hasContent ? '!rounded-bl-none !rounded-br-none' : ''}`}>
         <div className={`w-full [&_*]:outline-none ${isFirst ? 'first-editor' : 'subsequent-editor'}`}>
           <EditorContent className="w-full" editor={editor} />
         </div>
       </Surface>
       {hasContent && (
-        <div className="mt-4">
-          <ModelPicker isSecondary={true} />
+        <div>
+          <ModelPicker isSecondary={false} />
         </div>
       )}
     </div>
