@@ -136,7 +136,6 @@ export const BlockEditor = ({
             )}
           </div>
         </div>
-        <ContentItemMenu editor={editor} isEditable={isEditable} />
         <LinkMenu editor={editor} appendTo={menuContainerRef} />
         <TextMenu editor={editor} />
         <ColumnsMenu editor={editor} appendTo={menuContainerRef} />

@@ -68,8 +68,8 @@ export const GROUPS: Group[] = [
         },
       },
       {
-        name: 'numberedList',
-        label: 'Numbered List',
+        name: 'orderedList',
+        label: 'Ordered List',
         iconName: 'ListOrdered',
         description: 'Ordered list of items',
         aliases: ['ol'],
@@ -80,38 +80,19 @@ export const GROUPS: Group[] = [
       {
         name: 'taskList',
         label: 'Task List',
-        iconName: 'ListTodo',
-        description: 'Task list with todo items',
+        iconName: 'CheckSquare',
+        description: 'List with checkboxes',
         aliases: ['todo'],
         action: editor => {
           editor.chain().focus().toggleTaskList().run()
         },
       },
       {
-        name: 'toggleList',
-        label: 'Toggle List',
-        iconName: 'ListCollapse',
-        description: 'Toggles can show and hide content',
-        aliases: ['toggle'],
-        action: editor => {
-          editor.chain().focus().setDetails().run()
-        },
-      },
-      {
-        name: 'blockquote',
-        label: 'Blockquote',
-        iconName: 'Quote',
-        description: 'Element for quoting',
-        action: editor => {
-          editor.chain().focus().setBlockquote().run()
-        },
-      },
-      {
         name: 'codeBlock',
         label: 'Code Block',
-        iconName: 'SquareCode',
-        description: 'Code block with syntax highlighting',
-        shouldBeHidden: editor => editor.isActive('columns'),
+        iconName: 'Code2',
+        description: 'Code with syntax highlighting',
+        aliases: ['code'],
         action: editor => {
           editor.chain().focus().setCodeBlock().run()
         },
@@ -123,90 +104,47 @@ export const GROUPS: Group[] = [
     title: 'Insert',
     commands: [
       {
+        name: 'horizontalRule',
+        label: 'Horizontal Rule',
+        iconName: 'Minus',
+        description: 'Insert a horizontal divider',
+        aliases: ['hr', 'divider', '---'],
+        action: editor => {
+          editor.chain().focus().setHorizontalRule().run()
+        },
+      },
+      {
+        name: 'columns',
+        label: 'Columns',
+        iconName: 'Columns',
+        description: 'Add two columns side by side',
+        aliases: ['cols'],
+        action: editor => {
+          editor.chain().focus().setColumns().run()
+        },
+      },
+      {
         name: 'table',
         label: 'Table',
         iconName: 'Table',
         description: 'Insert a table',
-        shouldBeHidden: editor => editor.isActive('columns'),
+        aliases: ['tb'],
         action: editor => {
-          editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: false }).run()
+          editor
+            .chain()
+            .focus()
+            .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+            .run()
         },
       },
       {
         name: 'image',
         label: 'Image',
         iconName: 'Image',
-        description: 'Insert an image',
+        description: 'Upload an image',
         aliases: ['img'],
         action: editor => {
           editor.chain().focus().setImageUpload().run()
-        },
-      },
-      {
-        name: 'columns',
-        label: 'Columns',
-        iconName: 'Columns2',
-        description: 'Add two column content',
-        aliases: ['cols'],
-        shouldBeHidden: editor => editor.isActive('columns'),
-        action: editor => {
-          editor
-            .chain()
-            .focus()
-            .setColumns()
-            .focus(editor.state.selection.head - 1)
-            .run()
-        },
-      },
-      {
-        name: 'horizontalRule',
-        label: 'Horizontal Rule',
-        iconName: 'Minus',
-        description: 'Insert a horizontal divider',
-        aliases: ['hr'],
-        action: editor => {
-          editor.chain().focus().setHorizontalRule().run()
-        },
-      },
-      {
-        name: 'toc',
-        label: 'Table of Contents',
-        iconName: 'Book',
-        aliases: ['outline'],
-        description: 'Insert a table of contents',
-        shouldBeHidden: editor => editor.isActive('columns'),
-        action: editor => {
-          editor.chain().focus().insertTableOfContents().run()
-        },
-      },
-      {
-        name: 'helloWorld',
-        label: 'Hello World',
-        iconName: 'Sparkles',
-        description: 'Insert a Hello World block',
-        aliases: ['hello'],
-        action: editor => {
-          editor.chain().focus().setHelloWorld().run()
-        },
-      },
-      {
-        name: 'goodbyeWorld',
-        label: 'Goodbye World',
-        iconName: 'Sparkles',
-        description: 'Insert a Goodbye World block',
-        aliases: ['goodbye'],
-        action: editor => {
-          editor.chain().focus().setGoodbyeWorld().run()
-        },
-      },
-      {
-        name: 'meta',
-        label: 'Meta',
-        iconName: 'Bot',
-        description: 'Insert a metaprompting block',
-        aliases: ['prompt', 'ai'],
-        action: editor => {
-          editor.chain().focus().setMeta().run()
         },
       },
     ],
