@@ -2,7 +2,6 @@
 
 import { TiptapCollabProvider } from '@hocuspocus/provider'
 import 'iframe-resizer/js/iframeResizer.contentWindow'
-import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Doc as YDoc } from 'yjs'
 
@@ -22,17 +21,16 @@ const useDarkmode = () => {
   }
 }
 
-export default function Document({ params }: { params: { room: string } }) {
+export default function WeekOneExperiment() {
   const { isDarkMode } = useDarkmode()
   const [aiToken, setAiToken] = useState<string | null | undefined>()
-  const searchParams = useSearchParams()
+  
   const providerState = useCollaboration({
-    docId: params.room,
-    enabled: parseInt(searchParams?.get('noCollab') as string) !== 1,
+    docId: 'week-1',
+    enabled: true,
   })
 
   useEffect(() => {
-    // fetch data
     const dataFetch = async () => {
       try {
         const response = await fetch('/api/ai', {
@@ -46,10 +44,7 @@ export default function Document({ params }: { params: { room: string } }) {
           throw new Error('No AI token provided, please set TIPTAP_AI_SECRET in your environment')
         }
         const data = await response.json()
-
         const { token } = data
-
-        // set state when the data received
         setAiToken(token)
       } catch (e) {
         if (e instanceof Error) {
@@ -63,11 +58,14 @@ export default function Document({ params }: { params: { room: string } }) {
     dataFetch()
   }, [])
 
-  if (providerState.state === 'loading' || aiToken === undefined) return
+  if (providerState.state === 'loading' || aiToken === undefined) return null
+
+  // Only render BlockEditor when we have both yDoc and provider
+  if (!providerState.yDoc || !providerState.provider) return null
 
   return (
     <div className="relative">
       <BlockEditor ydoc={providerState.yDoc} provider={providerState.provider} />
     </div>
   )
-}
+} 

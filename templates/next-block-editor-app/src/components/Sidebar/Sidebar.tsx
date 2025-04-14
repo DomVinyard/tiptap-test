@@ -1,8 +1,11 @@
+'use client'
+
 import { memo } from 'react'
 import { Editor } from '@tiptap/react'
 import { Icon } from '@/components/ui/Icon'
 import React from 'react'
 import type { ComponentProps } from 'react'
+import Link from 'next/link'
 
 const SectionTitle = ({ children }: { children: string }) => (
   <h2 className="mb-2 text-xs font-semibold uppercase text-gray-500">{children}</h2>
@@ -81,11 +84,13 @@ export const Sidebar = memo(({ editor }: SidebarProps) => {
   return (
     <div className="w-[320px] border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black flex flex-col overflow-hidden">
       <div className="px-6 py-4 flex items-center justify-between">
-        <img 
-          src="https://cdn.prod.website-files.com/66e00503e1e57f5fafdfa7d5/66e005da47c0c33bca665c3a_wordware-logotype.svg" 
-          alt="Wordware"
-          className="h-5 opacity-70 hover:opacity-100 transition-opacity"
-        />
+        <Link href="/">
+          <img 
+            src="https://cdn.prod.website-files.com/66e00503e1e57f5fafdfa7d5/66e005da47c0c33bca665c3a_wordware-logotype.svg" 
+            alt="Wordware"
+            className="h-5 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
+          />
+        </Link>
         <div className="flex gap-1 items-center">
           <button className="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors">
             <Icon name="FilePlus" className="w-4 h-4 text-gray-500" />
