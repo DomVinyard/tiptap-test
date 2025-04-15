@@ -45,7 +45,7 @@ export const ContentTypePicker = ({ options }: ContentTypePickerProps) => {
         </Toolbar.Button>
       </Dropdown.Trigger>
       <Dropdown.Content asChild>
-        <Surface className="flex flex-col gap-1 px-2 py-0">
+        <Surface className="flex flex-col gap-1 px-2 py-2">
           {options.map(option => {
             if (isOption(option)) {
               return (

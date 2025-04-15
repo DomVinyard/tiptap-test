@@ -59,3 +59,46 @@ input[type='range'] {
     @apply dark:bg-neutral-100 dark:active:bg-white;
   }
 }
+
+.border-animation {
+  position: relative !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.border-animation::before {
+  content: "" !important;
+  display: block !important;
+  background: linear-gradient(
+    90deg,
+    hsla(197, 100%, 64%, 1) 0%,
+    hsla(339, 100%, 55%, 1) 100%
+  ) !important;
+  height: 500px !important;
+  width: 500px !important;
+  position: absolute !important;
+  animation: rotate 8s linear infinite !important;
+  z-index: 0 !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) rotate(0deg) !important;
+}
+
+.inner {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  margin: 3px !important;
+  background: inherit !important;
+}
+
+@keyframes rotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg) !important;
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg) !important;
+  }
+}
