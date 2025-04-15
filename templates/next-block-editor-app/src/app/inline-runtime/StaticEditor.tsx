@@ -781,8 +781,8 @@ export const StaticEditor: React.FC = () => {
         }, 1000);
         // Longer delay for sidebar update
         setTimeout(() => {
-          setOutputs(prev => [...prev, { text: output, timestamp: new Date() }]);
-        }, 1900);
+          setOutputs(prev => [...prev, { text: "Output/Artifacts from that run will go here", timestamp: new Date() }]);
+        }, 1700);
       }, 500); // New delay before showing checkmark
       setIsFirstRun(true);
     }
