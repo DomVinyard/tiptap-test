@@ -5,6 +5,12 @@ import { Surface } from '@/components/ui/Surface'
 
 const experiments = [
   {
+    id: 'agents-studio',
+    title: 'Agents & Studio',
+    description: 'A dedicated environment for creating, managing, and interacting with AI agents, featuring a modern studio interface for agent development and testing.',
+    date: '2024-04-24',
+  },
+  {
     id: 'inline-runtime',
     title: 'Inline Runtime UX',
     description: 'Exploring improvements to the runtime user experience with inline interactions and feedback.',

@@ -21,7 +21,7 @@
   }
 
   .subsequent-editor & > .is-editor-empty:first-child:last-child::before {
-    content: 'Continue your app here or press "Run"...';
+    content: 'Continue your app here or press "Run" to test...';
   }
 
   /* Blockquote Placeholder */
