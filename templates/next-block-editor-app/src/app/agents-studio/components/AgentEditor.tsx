@@ -1,8 +1,11 @@
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useState } from 'react'
 
 interface AgentEditorProps {
   isPreviewMode?: boolean
+  isExpanded?: boolean
+  onExpandedChange?: (expanded: boolean) => void
 }
 
 function DocumentIcon() {
@@ -57,7 +60,11 @@ function SparkleIcon() {
   )
 }
 
-export function AgentEditor({ isPreviewMode = false }: AgentEditorProps) {
+export function AgentEditor({ 
+  isPreviewMode = false, 
+  isExpanded = false,
+  onExpandedChange
+}: AgentEditorProps) {
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#EDF5FB] to-[#F2F7FA] p-8">
       <div className={cn(
@@ -177,8 +184,15 @@ export function AgentEditor({ isPreviewMode = false }: AgentEditorProps) {
           </div>
         </div>
 
-        <p className="mt-4 text-slate-700">
-          Append the categories to the initial data and return a CSV file with the category appended into the final column.
+        <p 
+          className="mt-4 text-slate-700 cursor-pointer hover:text-slate-900 transition-colors"
+          onClick={() => onExpandedChange?.(!isExpanded)}
+        >
+          {isExpanded ? (
+            "Append the categories to the initial data and return a CSV file with the category appended into the final column. This will create a new column called 'Category' at the end of each row, containing the AI-generated business category based on the vendor name and transaction details. The output will maintain all original columns and data integrity."
+          ) : (
+            "Append the categories to the initial data and return a CSV file with the category appended into the final column."
+          )}
         </p>
 
         <div className="mt-4">

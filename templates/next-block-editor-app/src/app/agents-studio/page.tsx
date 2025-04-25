@@ -130,17 +130,26 @@ const agentContents: Record<string, Agent> = {
 export default function AgentsStudioPage() {
   const [selectedAgent, setSelectedAgent] = useState('invoices')
   const [isEditorOpen, setIsEditorOpen] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
   const currentAgent = agentContents[selectedAgent]
 
   return (
     <div className="flex min-h-screen relative">
-      <Sidebar onSelectAgent={setSelectedAgent} selectedAgent={selectedAgent} />
+      <Sidebar 
+        onSelectAgent={setSelectedAgent} 
+        selectedAgent={selectedAgent}
+        isEditorOpen={isEditorOpen}
+      />
       
       {/* Editor Panel - Always full width */}
       <div className="flex-1 border-r border-slate-300 dark:border-slate-800">
         <div className="h-full overflow-auto">
           <div className="pr-80">
-            <AgentEditor isPreviewMode={!isEditorOpen} />
+            <AgentEditor 
+              isPreviewMode={!isEditorOpen} 
+              isExpanded={isExpanded}
+              onExpandedChange={setIsExpanded}
+            />
           </div>
         </div>
       </div>
@@ -158,7 +167,7 @@ export default function AgentsStudioPage() {
                 onClick={() => setIsEditorOpen(false)}
                 className="text-sm text-white hover:opacity-80 cursor-pointer transition-opacity"
               >
-                ← View Deployed Agent
+                ← {isExpanded ? "Save changes" : "View Deployed Agent"}
               </span>
             </div>
           ) : (

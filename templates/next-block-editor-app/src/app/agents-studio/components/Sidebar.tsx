@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Star, FileText, Send, Bot } from 'lucide-react'
+import { Star, FileText, Send, Bot, FolderOpen } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface SidebarProps {
   selectedAgent: string
   onSelectAgent: (agent: string) => void
+  isEditorOpen?: boolean
 }
 
 const connections = [
@@ -56,7 +58,7 @@ function ExploreGrid() {
   )
 }
 
-export function Sidebar({ selectedAgent, onSelectAgent }: SidebarProps) {
+export function Sidebar({ selectedAgent, onSelectAgent, isEditorOpen = false }: SidebarProps) {
   return (
     <div className="w-80 h-screen flex flex-col border-r border-slate-300 dark:border-slate-800 bg-[#FAF8F6] dark:bg-slate-900">
       {/* Logo */}
@@ -97,6 +99,41 @@ export function Sidebar({ selectedAgent, onSelectAgent }: SidebarProps) {
 
       {/* Main Navigation */}
       <div className="flex-1 overflow-y-auto">
+        {/* Agent Files Section */}
+        <div className={cn(
+          "transition-all duration-500 ease-in-out overflow-hidden",
+          isEditorOpen ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0"
+        )}>
+          <div className="px-3 pt-4">
+            <h3 className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-2 flex items-center gap-2">
+              <FolderOpen className="w-4 h-4" />
+              Agent Files
+            </h3>
+            <div className="space-y-1">
+              <div className={cn(
+                "flex items-center gap-2 py-2 px-2 text-sm rounded-md",
+                isEditorOpen 
+                  ? "bg-slate-200/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100" 
+                  : "text-slate-700 dark:text-slate-300 hover:bg-slate-200/30 dark:hover:bg-slate-800/30"
+              )}>
+                <FileText className={cn(
+                  "flex-shrink-0 w-4 h-4",
+                  isEditorOpen ? "text-slate-600 dark:text-slate-400" : "text-slate-400"
+                )} />
+                <span className="truncate">Main</span>
+              </div>
+              <div className="flex items-center gap-2 py-2 px-2 text-sm text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200/30 dark:hover:bg-slate-800/30">
+                <FileText className="flex-shrink-0 w-4 h-4 text-slate-400" />
+                <span className="truncate">Invoice Scanner</span>
+              </div>
+              <div className="flex items-center gap-2 py-2 px-2 text-sm text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200/30 dark:hover:bg-slate-800/30">
+                <FileText className="flex-shrink-0 w-4 h-4 text-slate-400" />
+                <span className="truncate">CSV Parser</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Favorites Section */}
         <div className="px-3 pt-4">
           <h3 className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-2">
@@ -108,13 +145,13 @@ export function Sidebar({ selectedAgent, onSelectAgent }: SidebarProps) {
                 key={item.id}
                 onClick={() => onSelectAgent(item.id)}
                 className={`flex w-full items-center gap-2 py-2 px-2 text-sm group rounded-md text-left
-                         ${selectedAgent === item.id 
+                         ${!isEditorOpen && selectedAgent === item.id 
                            ? 'bg-slate-200/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100' 
                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/30 dark:hover:bg-slate-800/30'
                          }`}
               >
                 <Star className={`flex-shrink-0 w-4 h-4 ${
-                  selectedAgent === item.id 
+                  !isEditorOpen && selectedAgent === item.id 
                     ? 'text-slate-600 dark:text-slate-400' 
                     : 'text-slate-400 group-hover:text-slate-500'
                 }`} />
