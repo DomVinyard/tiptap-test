@@ -11,7 +11,7 @@ import { AgentEditor } from './components/AgentEditor'
 type Agent = {
   title: string
   description: string
-  content: React.ReactNode
+  content: (isEditorOpen: boolean) => React.ReactNode
   stats: {
     downloads: string
     rating: string
@@ -23,11 +23,14 @@ const agentContents: Record<string, Agent> = {
   'invoices': {
     title: 'Categorize invoices by vendor',
     description: 'Automatically categorizes invoices from a CSV file using AI. For each invoice row, it analyzes the vendor name, description, and total amount to assign a business-relevant category (e.g. "SaaS", "Travel", "Marketing")',
-    content: (
+    content: (isEditorOpen: boolean) => (
       <>
         {/* CSV Upload */}
         <div>
-          <label className="text-base font-large">
+          <label className={cn(
+            "font-large transition-all",
+            isEditorOpen ? "text-base" : "text-lg"
+          )}>
             Analyze this CSV File <span className="text-red-500">*</span>
           </label>
           <div className="text-xs text-slate-500 mt-2">
@@ -37,7 +40,12 @@ const agentContents: Record<string, Agent> = {
 
         {/* Category Style */}
         <div>
-          <label className="text-base font-large">And automatically apply this category style to each row</label>
+          <label className={cn(
+            "font-large transition-all",
+            isEditorOpen ? "text-base" : "text-lg"
+          )}>
+            And automatically apply this category style to each row
+          </label>
           <input
             type="text"
             className="w-full mt-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 
@@ -59,11 +67,14 @@ const agentContents: Record<string, Agent> = {
   'emails': {
     title: 'Unsubscribe from all spam emails',
     description: 'Automatically identify and unsubscribe from unwanted promotional emails and newsletters. This agent analyzes your inbox to find spam and marketing emails, then safely handles the unsubscription process.',
-    content: (
+    content: (isEditorOpen: boolean) => (
       <>
         {/* Gmail Connection */}
         <div>
-          <label className="text-base font-medium">
+          <label className={cn(
+            "font-large transition-all",
+            isEditorOpen ? "text-base" : "text-lg"
+          )}>
             First, connect to my Gmail <span className="text-red-500">*</span>
           </label>
           <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4 mt-2">
@@ -86,7 +97,12 @@ const agentContents: Record<string, Agent> = {
 
         {/* Unsubscribe Settings */}
         <div>
-          <label className="text-base font-medium">Then automatically unsubscribe from these email categories</label>
+          <label className={cn(
+            "font-large transition-all",
+            isEditorOpen ? "text-base" : "text-lg"
+          )}>
+            Then automatically unsubscribe from these email categories
+          </label>
           <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 mt-2">
             <div>
               <label className="flex items-center gap-2 py-2.5 px-3 cursor-pointer">
@@ -108,7 +124,12 @@ const agentContents: Record<string, Agent> = {
 
         {/* Exceptions */}
         <div>
-          <label className="text-base font-medium">But keep emails from these senders</label>
+          <label className={cn(
+            "font-large transition-all",
+            isEditorOpen ? "text-base" : "text-lg"
+          )}>
+            But keep emails from these senders
+          </label>
           <textarea
             className="w-full mt-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 
                     bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none
@@ -238,7 +259,7 @@ export default function AgentsStudioPage() {
           isEditorOpen ? "px-4 py-4" : "px-4 pt-12 pb-8"
         )}>
           <div className="max-w-4xl mx-auto space-y-12 transition-all duration-500 ease-in-out origin-right">
-            {currentAgent.content}
+            {currentAgent.content(isEditorOpen)}
 
             {/* Action Bar */}
             <div className="flex items-center justify-end gap-4 pt-4">
@@ -256,7 +277,10 @@ export default function AgentsStudioPage() {
                   "px-6 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg font-medium flex items-center gap-2 transition-all"
                 )}
               >
-                {selectedAgent === 'invoices' ? 'Generate Categorized CSV' : 'Unsubscribe All Spam'}
+                {isEditorOpen 
+                  ? 'Run'
+                  : selectedAgent === 'invoices' ? 'Generate Categorized CSV' : 'Unsubscribe All Spam'
+                }
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
