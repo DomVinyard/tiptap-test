@@ -4,6 +4,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Star, FileText, Send, Bot } from 'lucide-react'
 
+interface SidebarProps {
+  selectedAgent: string
+  onSelectAgent: (agent: string) => void
+}
+
 const connections = [
   {
     name: 'Gmail',
@@ -28,14 +33,14 @@ const connections = [
 ]
 
 const favorites = [
-  { name: 'Categorize invoices by vendor', path: '/agents-studio' },
-  { name: 'Summarize customer reviews', path: '/agents-studio/reviews' }
+  { id: 'invoices', name: 'Categorize invoices by vendor', path: '/agents-studio' },
+  { id: 'emails', name: 'Unsubscribe from all spam emails', path: '/agents-studio/emails' }
 ]
 
 const recentAgents = [
-  { name: 'Payment reminder emails', path: '/agents-studio/payments' },
-  { name: 'Simplify legal text', path: '/agents-studio/legal' },
-  { name: 'Create onboarding checklist', path: '/agents-studio/onboarding' }
+  { name: 'Payment reminder emails' },
+  { name: 'Simplify legal text' },
+  { name: 'Create onboarding checklist' }
 ]
 
 function ExploreGrid() {
@@ -51,18 +56,21 @@ function ExploreGrid() {
   )
 }
 
-export function Sidebar() {
+export function Sidebar({ selectedAgent, onSelectAgent }: SidebarProps) {
   return (
-    <div className="w-72 h-screen flex flex-col border-r border-slate-300 dark:border-slate-800 bg-[#FAF8F6] dark:bg-slate-900">
+    <div className="w-80 h-screen flex flex-col border-r border-slate-300 dark:border-slate-800 bg-[#FAF8F6] dark:bg-slate-900">
       {/* Logo */}
-      <div className="px-3 py-3 flex items-center">
-        <Link href="/">
+      <div className="px-3 py-3 flex items-center justify-between">
+        <Link href="/" className="flex items-center">
           <img 
             src="https://cdn.prod.website-files.com/66e00503e1e57f5fafdfa7d5/66e005da47c0c33bca665c3a_wordware-logotype.svg" 
             alt="Wordware"
             className="h-5 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
           />
         </Link>
+        <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+          <span className="text-sm font-medium text-blue-700 dark:text-blue-300">DV</span>
+        </div>
       </div>
 
       {/* Agent Input */}
@@ -91,40 +99,45 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto">
         {/* Favorites Section */}
         <div className="px-3 pt-4">
-          <h3 className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">
-            FAVORITES
+          <h3 className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-2">
+            Favorites
           </h3>
           <div className="space-y-1">
             {favorites.map((item) => (
-              <Link
-                key={item.path}
-                href={item.path}
-                className="flex items-center gap-2 py-2 text-sm text-slate-700 dark:text-slate-300 
-                         hover:text-slate-900 dark:hover:text-slate-100 group"
+              <button
+                key={item.id}
+                onClick={() => onSelectAgent(item.id)}
+                className={`flex w-full items-center gap-2 py-2 px-2 text-sm group rounded-md text-left
+                         ${selectedAgent === item.id 
+                           ? 'bg-slate-200/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100' 
+                           : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/30 dark:hover:bg-slate-800/30'
+                         }`}
               >
-                <Star className="w-4 h-4 text-slate-400 group-hover:text-slate-500" />
-                {item.name}
-              </Link>
+                <Star className={`flex-shrink-0 w-4 h-4 ${
+                  selectedAgent === item.id 
+                    ? 'text-slate-600 dark:text-slate-400' 
+                    : 'text-slate-400 group-hover:text-slate-500'
+                }`} />
+                <span className="truncate">{item.name}</span>
+              </button>
             ))}
           </div>
         </div>
 
         {/* Recent Agents Section */}
         <div className="px-3 pt-6">
-          <h3 className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">
-            RECENT AGENTS
+          <h3 className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-2">
+            Recent Agents
           </h3>
           <div className="space-y-1">
             {recentAgents.map((item) => (
-              <Link
-                key={item.path}
-                href={item.path}
-                className="flex items-center gap-2 py-2 text-sm text-slate-700 dark:text-slate-300 
-                         hover:text-slate-900 dark:hover:text-slate-100 group"
+              <div
+                key={item.name}
+                className="flex w-full items-center gap-2 py-2 px-2 text-sm text-slate-700 dark:text-slate-300"
               >
-                <FileText className="w-4 h-4 text-slate-400 group-hover:text-slate-500" />
-                {item.name}
-              </Link>
+                <FileText className="flex-shrink-0 w-4 h-4 text-slate-400" />
+                <span className="truncate">{item.name}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -132,8 +145,8 @@ export function Sidebar() {
 
       {/* Connections */}
       <div className="px-3 py-4 border-t border-slate-300 dark:border-slate-700">
-        <h3 className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">
-          YOUR CONNECTIONS
+        <h3 className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-2">
+          Your Connections
         </h3>
         <div className="space-y-1">
           {connections.map((connection) => (
