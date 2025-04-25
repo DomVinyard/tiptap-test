@@ -158,7 +158,7 @@ export default function AgentsStudioPage() {
                 onClick={() => setIsEditorOpen(false)}
                 className="text-sm text-white hover:opacity-80 cursor-pointer transition-opacity"
               >
-                ← Preview
+                ← View Deployed Agent
               </span>
             </div>
           ) : (
