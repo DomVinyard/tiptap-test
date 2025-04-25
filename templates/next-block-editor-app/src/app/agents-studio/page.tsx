@@ -27,16 +27,17 @@ const agentContents: Record<string, Agent> = {
       <>
         {/* CSV Upload */}
         <div>
-          <label className="text-base font-medium">
-            CSV File <span className="text-red-500">*</span>
+          <label className="text-base font-large">
+            Analyze this CSV File <span className="text-red-500">*</span>
           </label>
-          <FileUpload />
+          <div className="text-xs text-slate-500 mt-2">
+          <FileUpload /></div>
           <div className="text-xs text-slate-500 mt-2">The raw invoice CSV</div>
         </div>
 
         {/* Category Style */}
         <div>
-          <label className="text-base font-medium">Category Style</label>
+          <label className="text-base font-large">And automatically apply this category style to each row</label>
           <input
             type="text"
             className="w-full mt-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 
@@ -63,7 +64,7 @@ const agentContents: Record<string, Agent> = {
         {/* Gmail Connection */}
         <div>
           <label className="text-base font-medium">
-            Gmail <span className="text-red-500">*</span>
+            First, connect to my Gmail <span className="text-red-500">*</span>
           </label>
           <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4 mt-2">
             <div className="flex items-center justify-between">
@@ -85,7 +86,7 @@ const agentContents: Record<string, Agent> = {
 
         {/* Unsubscribe Settings */}
         <div>
-          <label className="text-base font-medium">Email Categories</label>
+          <label className="text-base font-medium">Then automatically unsubscribe from these email categories</label>
           <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 mt-2">
             <div>
               <label className="flex items-center gap-2 py-2.5 px-3 cursor-pointer">
@@ -107,7 +108,7 @@ const agentContents: Record<string, Agent> = {
 
         {/* Exceptions */}
         <div>
-          <label className="text-base font-medium">Keep These Emails</label>
+          <label className="text-base font-medium">But keep emails from these senders</label>
           <textarea
             className="w-full mt-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 
                     bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none
@@ -225,9 +226,9 @@ export default function AgentsStudioPage() {
               </div>
             </div>
             <div className="text-sm font-medium mt-1">by Wordware</div>
-            <p className="mt-8 text-slate-500">
+            {/* <p className="mt-8 text-slate-500">
               {currentAgent.description}
-            </p>
+            </p> */}
           </div>
         </div>
 
@@ -252,14 +253,10 @@ export default function AgentsStudioPage() {
               </div>
               <button 
                 className={cn(
-                  "px-6 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg font-medium flex items-center gap-2 transition-all",
-                  selectedAgent === 'invoices' 
-                    ? "hover:opacity-90" 
-                    : "opacity-50 cursor-not-allowed"
+                  "px-6 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg font-medium flex items-center gap-2 transition-all"
                 )}
-                disabled={selectedAgent !== 'invoices'}
               >
-                Run Agent
+                {selectedAgent === 'invoices' ? 'Generate Categorized CSV' : 'Unsubscribe All Spam'}
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
