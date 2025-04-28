@@ -54,28 +54,13 @@ export function Quiz({ questions, onComplete }: QuizProps) {
   }
 
   return (
-    <div className="space-y-6 mb-8">
+    <div className="space-y-6 mb-8 ">
       {questions.map((question, index) => {
         const correct = isCorrect(index)
         return (
-          <div key={index} className="p-3 pt-2 border border-neutral-200 rounded-lg bg-neutral-50">
-            <div className="flex items-start gap-2 mb-3">
-              <svg 
-                width="20" 
-                height="20" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                className="text-neutral-400 flex-shrink-0 mt-0.5"
-              >
-                <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="2"/>
-                <path 
-                  d="M12 16.5V15M10 10C10 8.89543 10.8954 8 12 8C13.1046 8 14 8.89543 14 10C14 11.1046 13.1046 12 12 12V13.5" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round"
-                />
-              </svg>
-              <h3 className="font-medium text-lg">{question.question}</h3>
+          <div key={index} className="px-3 pb-3 pt-0 mt-0 border border-neutral-200 rounded-lg bg-neutral-50">
+            <div className="mb-2">
+              <h3 className="font-medium text-lg mt-4 ml-2">{question.question}</h3>
             </div>
             
             {question.type === 'fill-in' ? (
