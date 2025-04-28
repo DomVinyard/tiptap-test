@@ -184,24 +184,7 @@ export default function Education101Page() {
                   </div>
                 </div>
 
-                <div>
-                  <h2 className="text-2xl font-semibold mb-6">Lessons</h2>
-                  <div className="space-y-3">
-                    {lessons.map((lesson, index) => (
-                      <Link 
-                        key={lesson.id}
-                        href={`/education-101/lessons/${lesson.id}`}
-                        className="block hover:bg-neutral-50 -mx-4 px-4 py-2 rounded-lg"
-                      >
-                        <div className="flex items-baseline gap-4">
-                          <span className={`text-neutral-400 w-6 flex-none ${dmMono.className}`}>{String(index + 1).padStart(2, '0')}</span>
-                          <span className={dmMono.className}>{lesson.title}</span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-
+              
                 <div>
                   <h2 className="text-2xl font-semibold mb-6">This tutorial includes</h2>
                   <div className="space-y-4">
