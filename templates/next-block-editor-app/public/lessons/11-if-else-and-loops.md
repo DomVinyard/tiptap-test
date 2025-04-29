@@ -7,7 +7,7 @@ import { lesson11Quiz } from '@/app/education-101/quizData'
 todo
 </VideoSection>
 
-# If/Else & Loops
+# Conditions & Loops
 
 ## Understanding If-Else Nodes
 
