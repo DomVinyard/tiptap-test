@@ -2,10 +2,6 @@ import { VideoSection } from '@/components/VideoSection'
 import { Quiz } from '@/components/Quiz'
 import { lesson11Quiz } from '@/app/education-101/quizData'
 
-<VideoSection id="if-else-and-loops" />
-
-
-
 
 <VideoSection>
 todo

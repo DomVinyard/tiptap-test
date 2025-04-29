@@ -83,7 +83,7 @@ export const lessons: Lesson[] = [
   },
   {
     id: '11-if-else-and-loops',
-    title: 'If/Else & Loops',
+    title: 'Conditions & Loops',
     duration: '5 min',
     description: 'Add logic to your AI workflows',
     videoUrl: 'https://example.com/videos/if-else-loops',
