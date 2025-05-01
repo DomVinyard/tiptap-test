@@ -5,6 +5,12 @@ import { Surface } from '@/components/ui/Surface'
 
 const experiments = [
   {
+    id: 'three-layers-abstraction',
+    title: 'Three Layers of Abstraction',
+    description: 'A dedicated environment for creating, managing, and interacting with AI agents, featuring a modern studio interface for agent development and testing.',
+    date: '2024-04-30',
+  },
+  {
     id: 'agents-studio',
     title: 'Agents & Studio',
     description: 'A dedicated environment for creating, managing, and interacting with AI agents, featuring a modern studio interface for agent development and testing.',

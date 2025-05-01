@@ -11,8 +11,8 @@ export function LessonVideo({ title, duration, videoUrl, thumbnailUrl }: LessonV
   const [isPlaying, setIsPlaying] = useState(false)
 
   if (!isPlaying) {
-    return (
-      <button 
+  return (
+        <button 
         onClick={() => setIsPlaying(true)}
         className="w-full relative aspect-video bg-neutral-100 rounded-lg overflow-hidden group"
       >
@@ -29,7 +29,7 @@ export function LessonVideo({ title, duration, videoUrl, thumbnailUrl }: LessonV
             <div className="text-white font-medium">{duration}</div>
           </div>
         </div>
-      </button>
+        </button>
     )
   }
 

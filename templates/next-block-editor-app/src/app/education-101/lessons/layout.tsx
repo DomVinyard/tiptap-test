@@ -66,7 +66,7 @@ export default function LessonLayout({
   return (
     <div className="min-h-screen bg-white">
       <Header currentIndex={currentIndex} currentLesson={currentLesson} />
-      
+
       <div className="pt-24 pb-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex gap-8">
@@ -74,14 +74,14 @@ export default function LessonLayout({
             <div className="flex-1 min-w-0">
               {/* Video */}
 
-              {/* Lesson Content */}
+          {/* Lesson Content */}
               <div className="mb-8">
                 <div className="prose prose-blue max-w-none [&_.video-section]:mt-0 [&_.video-section+h1]:mt-8 prose-h1:mt-0 prose-h2:mt-12">
-                  {children}
+            {children}
                 </div>
               </div>
 
-              {/* Navigation Footer */}
+          {/* Navigation Footer */}
               <div className="flex justify-between items-center">
                 {currentIndex === 0 ? (
                   <Link
@@ -92,27 +92,27 @@ export default function LessonLayout({
                     <span>Previous</span>
                   </Link>
                 ) : prevLesson ? (
-                  <Link
-                    href={`/education-101/lessons/${prevLesson.id}`}
+              <Link
+                href={`/education-101/lessons/${prevLesson.id}`}
                     className="flex items-center gap-2 px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-md transition-colors"
-                  >
-                    <span>←</span>
+              >
+                <span>←</span>
                     <span>Previous</span>
-                  </Link>
-                ) : (
-                  <div />
-                )}
-                {nextLesson ? (
-                  <Link
-                    href={`/education-101/lessons/${nextLesson.id}`}
+              </Link>
+            ) : (
+              <div />
+            )}
+            {nextLesson ? (
+              <Link
+                href={`/education-101/lessons/${nextLesson.id}`}
                     className="flex items-center gap-2 px-4 py-2 bg-black hover:bg-neutral-800 text-white rounded-md transition-colors"
-                  >
+              >
                     <span>Next</span>
-                    <span>→</span>
-                  </Link>
-                ) : (
-                  <div />
-                )}
+                <span>→</span>
+              </Link>
+            ) : (
+              <div />
+            )}
               </div>
             </div>
 
