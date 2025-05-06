@@ -286,6 +286,14 @@ export const searchTasks = {
       run_count: 67842,
       eval_rating: 4.5,
       cost: 2,
+      demo_output: {
+        type: 'file' as const,
+        output: 'simplified-tax-memo-2024.pdf',
+        metadata: {
+          fileType: 'PDF Document',
+          summary: 'Simplified tax memo with clear explanations'
+        }
+      },
       form: {
         fields: [
           {
@@ -334,6 +342,15 @@ export const searchTasks = {
       run_count: 93287,
       eval_rating: 4.9,
       cost: 3,
+      demo_output: {
+        type: 'website' as const,
+        output: 'https://finance.example.com/summary/2024-q1',
+        metadata: {
+          url: 'https://finance.example.com/summary/2024-q1',
+          thumbnail: '/financial-summary-preview.png',
+          summary: 'Interactive financial summary with visualizations'
+        }
+      },
       form: {
         fields: [
           {
@@ -469,6 +486,27 @@ export const searchTasks = {
       run_count: 145632,
       eval_rating: 4.7,
       cost: 3,
+      demo_output: {
+        type: 'code' as const,
+        output: `{
+  "important_clauses": [
+    {
+      "clause_type": "Payment Terms",
+      "location": "Section 3.1",
+      "risk_level": "medium",
+      "summary": "Monthly rent of $12,000 due on the 1st, 3% late fee after 5th"
+    },
+    {
+      "clause_type": "Maintenance",
+      "location": "Section 7.2",
+      "risk_level": "high",
+      "summary": "Tenant responsible for all repairs including HVAC system"
+    }
+  ],
+  "analysis_date": "2024-03-15",
+  "document_type": "Commercial Lease"
+}`
+      },
       form: {
         fields: [
           {
@@ -528,6 +566,10 @@ export const searchTasks = {
       run_count: 173492,
       eval_rating: 4.6,
       cost: 2,
+      demo_output: {
+        type: 'message' as const,
+        output: 'Original Text:\n"The party of the first part shall indemnify and hold harmless the party of the second part from any and all claims, damages, losses, and expenses arising out of or resulting from performance of the work."\n\nSimplified Version:\n"We (the contractor) will protect you from any costs or damages that happen because of our work on this project."'
+      },
       form: {
         fields: [
           {
@@ -577,6 +619,14 @@ export const searchTasks = {
       run_count: 87234,
       eval_rating: 4.4,
       cost: 3,
+      demo_output: {
+        type: 'file' as const,
+        output: 'nda-analysis-report.pdf',
+        metadata: {
+          fileType: 'PDF Report',
+          summary: 'NDA analysis with missing terms highlighted'
+        }
+      },
       form: {
         fields: [
           {
@@ -626,6 +676,14 @@ export const searchTasks = {
       run_count: 74325,
       eval_rating: 4.2,
       cost: 3,
+      demo_output: {
+        type: 'file' as const,
+        output: 'msa-obligations-matrix.xlsx',
+        metadata: {
+          fileType: 'Excel Spreadsheet',
+          summary: 'Comprehensive matrix of MSA obligations'
+        }
+      },
       form: {
         fields: [
           {
@@ -675,6 +733,15 @@ export const searchTasks = {
       run_count: 63421,
       eval_rating: 4.5,
       cost: 4,
+      demo_output: {
+        type: 'website' as const,
+        output: 'https://legal.example.com/tos-analysis/2024-03-15',
+        metadata: {
+          url: 'https://legal.example.com/tos-analysis/2024-03-15',
+          thumbnail: '/tos-analysis-preview.png',
+          summary: 'Interactive ToS risk analysis dashboard'
+        }
+      },
       form: {
         fields: [
           {
@@ -784,6 +851,14 @@ export const searchTasks = {
       run_count: 143752,
       eval_rating: 4.5,
       cost: 2,
+      demo_output: {
+        type: 'file' as const,
+        output: 'candidate-evaluation-march15.pdf',
+        metadata: {
+          fileType: 'PDF Report',
+          summary: 'Structured interview scorecard with ratings'
+        }
+      },
       form: {
         fields: [
           {
@@ -834,6 +909,10 @@ export const searchTasks = {
       run_count: 98543,
       eval_rating: 4.3,
       cost: 3,
+      demo_output: {
+        type: 'message' as const,
+        output: 'Performance Summary Q1 2024:\n\nStrengths:\n- Exceeded project delivery targets by 15%\n- Successfully mentored 2 junior team members\n- Implemented cost-saving measures worth $50,000\n\nAreas for Growth:\n- Consider taking on more strategic planning responsibilities\n- Continue developing presentation skills\n\nOverall Rating: Exceeds Expectations'
+      },
       form: {
         fields: [
           {
@@ -891,6 +970,15 @@ export const searchTasks = {
       run_count: 75632,
       eval_rating: 4.2,
       cost: 3,
+      demo_output: {
+        type: 'website' as const,
+        output: 'https://hr.example.com/feedback-analysis/2024-q1',
+        metadata: {
+          url: 'https://hr.example.com/feedback-analysis/2024-q1',
+          thumbnail: '/feedback-analysis-preview.png',
+          summary: 'Interactive feedback analysis dashboard'
+        }
+      },
       form: {
         fields: [
           {
@@ -943,6 +1031,14 @@ export const searchTasks = {
       run_count: 53245,
       eval_rating: 4.1,
       cost: 1,
+      demo_output: {
+        type: 'file' as const,
+        output: 'hr-policies-faq.pdf',
+        metadata: {
+          fileType: 'PDF Document',
+          summary: 'HR policies in searchable FAQ format'
+        }
+      },
       form: {
         fields: [
           {
@@ -989,6 +1085,13 @@ export const searchTasks = {
       run_count: 124563,
       eval_rating: 4.7,
       cost: 2,
+      demo_output: {
+        type: 'integration' as const,
+        output: 'Created onboarding checklist in Asana\nSynced with HR onboarding system\nGenerated PDF version for documentation',
+        metadata: {
+          platform: 'Asana, HR System'
+        }
+      },
       form: {
         fields: [
           {
@@ -1102,6 +1205,10 @@ export const searchTasks = {
       run_count: 167432,
       eval_rating: 4.7,
       cost: 2,
+      demo_output: {
+        type: 'message' as const,
+        output: 'Original:\n"Our new ML-powered data processing engine utilizes advanced neural networks with multi-layered perceptrons to achieve 99.9% accuracy in anomaly detection."\n\nSimplified for LinkedIn:\n"🚀 Big news! Our AI-powered system now catches issues with 99.9% accuracy. How? By using smart technology that learns and adapts - just like your brain! 🧠\n\n#AI #Innovation #TechNews"'
+      },
       form: {
         fields: [
           {
@@ -1152,6 +1259,14 @@ export const searchTasks = {
       run_count: 86543,
       eval_rating: 4.3,
       cost: 3,
+      demo_output: {
+        type: 'file' as const,
+        output: 'ai-trends-blog-series.zip',
+        metadata: {
+          fileType: 'ZIP Archive',
+          summary: 'Series of blog posts extracted from webinar'
+        }
+      },
       form: {
         fields: [
           {
@@ -1210,6 +1325,15 @@ export const searchTasks = {
       run_count: 132456,
       eval_rating: 4.6,
       cost: 3,
+      demo_output: {
+        type: 'website' as const,
+        output: 'https://analytics.example.com/reviews/2024-q1',
+        metadata: {
+          url: 'https://analytics.example.com/reviews/2024-q1',
+          thumbnail: '/review-analysis-preview.png',
+          summary: 'Interactive review analysis dashboard'
+        }
+      },
       form: {
         fields: [
           {
@@ -1264,6 +1388,14 @@ export const searchTasks = {
       run_count: 65432,
       eval_rating: 4.4,
       cost: 4,
+      demo_output: {
+        type: 'file' as const,
+        output: 'brand-voice-guide-2024.pdf',
+        metadata: {
+          fileType: 'PDF Document',
+          summary: 'Comprehensive brand voice guide with examples'
+        }
+      },
       form: {
         fields: [
           {
@@ -1335,6 +1467,10 @@ export const searchTasks = {
       run_count: 154321,
       eval_rating: 4.8,
       cost: 1,
+      demo_output: {
+        type: 'message' as const,
+        output: '🧵 1/5 Just launched our new AI-powered analytics platform! Here\'s everything you need to know...\n\n2/5 Key Features:\n• Real-time data processing\n• Custom dashboards\n• Predictive insights\n\n3/5 Early users are seeing:\n• 40% faster analysis\n• 60% better predictions\n• 25% cost savings\n\n4/5 Getting started is easy:\n1. Sign up\n2. Connect your data\n3. Choose templates\n4. Start analyzing\n\n5/5 Ready to transform your data game? Try it free: https://example.com/trial\n\n#AI #Analytics #DataScience'
+      },
       form: {
         fields: [
           {
@@ -1438,6 +1574,14 @@ export const searchTasks = {
       run_count: 93245,
       eval_rating: 4.5,
       cost: 3,
+      demo_output: {
+        type: 'file' as const,
+        output: 'ux-copy-suggestions.csv',
+        metadata: {
+          fileType: 'CSV Spreadsheet',
+          summary: 'UI copy suggestions with context and variations'
+        }
+      },
       form: {
         fields: [
           {
@@ -1495,6 +1639,10 @@ export const searchTasks = {
       run_count: 158732,
       eval_rating: 4.9,
       cost: 2,
+      demo_output: {
+        type: 'message' as const,
+        output: 'Original Error:\n"ERR_CONN_TIMEOUT: Connection attempt to remote server timed out after 30000ms"\n\nHumanized Message:\n"😅 Looks like we\'re having trouble connecting to our server right now. This usually happens when there\'s network congestion.\n\nWhat you can try:\n1. Wait a moment and try again\n2. Check your internet connection\n3. If the problem continues, our support team is here to help!"'
+      },
       form: {
         fields: [
           {
@@ -1544,6 +1692,15 @@ export const searchTasks = {
       run_count: 87652,
       eval_rating: 4.4,
       cost: 4,
+      demo_output: {
+        type: 'website' as const,
+        output: 'https://research.example.com/insights/2024-q1',
+        metadata: {
+          url: 'https://research.example.com/insights/2024-q1',
+          thumbnail: '/research-insights-preview.png',
+          summary: 'Interactive research insights dashboard'
+        }
+      },
       form: {
         fields: [
           {
@@ -1612,9 +1769,40 @@ export const searchTasks = {
       description: 'Prioritize user feedback based on frequency and impact',
       date: '2025-04-28',
       starred: false,
-      run_count: 72563,
-      eval_rating: 4.3,
+      run_count: 76543,
+      eval_rating: 4.6,
       cost: 3,
+      demo_output: {
+        type: 'code' as const,
+        output: `{
+  "feedback_themes": [
+    {
+      "theme": "Performance Issues",
+      "frequency": 127,
+      "impact_score": 8.5,
+      "priority": "high",
+      "key_quotes": [
+        "Dashboard takes >5s to load with large datasets",
+        "Export function freezes with >1000 rows"
+      ],
+      "affected_features": ["Dashboard", "Data Export"]
+    },
+    {
+      "theme": "Missing Bulk Actions",
+      "frequency": 89,
+      "impact_score": 7.2,
+      "priority": "medium",
+      "key_quotes": [
+        "Need to edit multiple items at once",
+        "Batch processing would save hours"
+      ],
+      "affected_features": ["Item Management", "Workflow"]
+    }
+  ],
+  "analysis_period": "Q1 2024",
+  "total_feedback_items": 523
+}`
+      },
       form: {
         fields: [
           {
@@ -1674,6 +1862,14 @@ export const searchTasks = {
       run_count: 103452,
       eval_rating: 4.6,
       cost: 3,
+      demo_output: {
+        type: 'file' as const,
+        output: 'product-requirements-summary.pdf',
+        metadata: {
+          fileType: 'PDF Document',
+          summary: 'Concise PRD summary with key features'
+        }
+      },
       form: {
         fields: [
           {
@@ -1730,7 +1926,15 @@ export const customTasks: TaskItemType[] = [
     version: 'v1.3',
     run_count: 5432,
     eval_rating: 4.2,
-    cost: 3
+    cost: 3,
+    demo_output: {
+      type: 'file' as const,
+      output: 'vendor-categorized-invoices.xlsx',
+      metadata: {
+        fileType: 'Excel Spreadsheet',
+        summary: 'Invoices sorted and tagged by vendor'
+      }
+    }
   },
   {
     id: 'task2',
@@ -1740,7 +1944,16 @@ export const customTasks: TaskItemType[] = [
     version: 'v2.1',
     run_count: 3215,
     eval_rating: 4.5,
-    cost: 4
+    cost: 4,
+    demo_output: {
+      type: 'website' as const,
+      output: 'https://contracts.example.com/summary/custom-2024',
+      metadata: {
+        url: 'https://contracts.example.com/summary/custom-2024',
+        thumbnail: '/contract-summary-preview.png',
+        summary: 'Interactive contract summary dashboard'
+      }
+    }
   },
   {
     id: 'task3',
@@ -1750,7 +1963,11 @@ export const customTasks: TaskItemType[] = [
     version: 'v1.0',
     run_count: 1754,
     eval_rating: 3.9,
-    cost: 2
+    cost: 2,
+    demo_output: {
+      type: 'message' as const,
+      output: 'Analysis of "Senior Developer" job posting:\n\n🔍 Found potentially non-inclusive terms:\n1. "ninja" → Suggest: "expert" or "specialist"\n2. "young and dynamic" → Suggest: "innovative and dynamic"\n3. "strong" → Suggest: "proficient" or "skilled"\n\n✨ Inclusive alternatives added\n📊 Overall inclusivity score: 85%\n💡 Additional suggestions for improvement provided'
+    }
   }
 ]
 
