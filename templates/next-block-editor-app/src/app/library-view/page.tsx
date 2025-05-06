@@ -204,6 +204,9 @@ function LibraryViewContent() {
   // Simplified state for panel visibility - no localStorage
   const [hiddenPanels, setHiddenPanels] = useState<{[key: string]: boolean}>({})
 
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
   const handleHidePanel = (panelId: string) => {
     setHiddenPanels(prev => ({
       ...prev,
@@ -369,6 +372,11 @@ function LibraryViewContent() {
     localStorage.removeItem('runArtifacts');
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsFormSubmitted(true);
+  };
+
   // Render content based on active sidebar item
   const renderMainContent = () => {
     // If a card is selected, show the detail view
@@ -425,54 +433,124 @@ function LibraryViewContent() {
             </div>
 
             {/* Centered Search Bar styled like AI chat input */}
-            <div className="max-w-2xl mx-auto mb-32 relative">
-              <input
-                type="text"
-                placeholder="Describe an AI Task..."
-                className="w-full pl-6 pr-14 py-4 border border-slate-300 dark:border-slate-600 rounded-full bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-              />
-              <button className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black dark:bg-white rounded-full flex items-center justify-center">
-                <ArrowRight className="w-5 h-5 text-white dark:text-black" />
-              </button>
+            <div className="max-w-2xl mx-auto relative">
+              <form onSubmit={handleSubmit} className="relative">
+                <input
+                  type="text"
+                  placeholder="Describe an AI Task..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-6 pr-14 py-4 border border-slate-300 dark:border-slate-600 rounded-full bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                />
+                <button 
+                  type={isFormSubmitted ? "button" : "submit"}
+                  onClick={() => {
+                    if (isFormSubmitted) {
+                      window.location.reload();
+                    }
+                  }}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black dark:bg-white rounded-full flex items-center justify-center"
+                >
+                  {isFormSubmitted ? (
+                    <X className="w-5 h-5 text-white dark:text-black" />
+                  ) : (
+                    <ArrowRight className="w-5 h-5 text-white dark:text-black" />
+                  )}
+                </button>
+              </form>
             </div>
 
-            {/* Content Sections */}
-            {pageSections.map(section => (
-              <div key={section.id} className="mb-16">
-                {/* Section Header */}
-                <div className="mb-3 flex justify-between">
-                  <h2 className={`text-2xl ${dmSerifDisplay.className} flex items-center`}>
-                    <span className={emojiSilhouette}>{section.emoji}</span>
-                    {section.title}
-                  </h2>
-                  <div className="flex items-center">
-                    <span 
-                      className="text-base text-black text-opacity-70 mt-3"
-                    >
-                      {section.viewAllLink} →
-                    </span>
+            {isFormSubmitted && (
+              <>
+                <div className="text-center mt-12 mb-12">
+                  <p className="text-xl text-slate-600 mb-2">We don't have that task yet, but it's a great idea!</p>
+                </div>
+                <div className="grid grid-cols-2 gap-8 max-w-[800px] mx-auto mb-32">
+                  {/* Build it for me CTA */}
+                  <div className="bg-transparent rounded-2xl p-8 text-center border border-black min-w-[300px]">
+                    <div className="w-24 h-24 mx-auto mb-6 relative">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Image 
+                          src="/library/robot_3.svg" 
+                          alt="Build it for me" 
+                          width={80} 
+                          height={80}
+                          className="opacity-90" 
+                        />
+                      </div>
+                    </div>
+                    <h3 className="text-2xl font-semibold mb-3">Build it for me</h3>
+                    <p className="text-slate-600 dark:text-slate-400 mb-6 text-lg">Let us handle everything</p>
+                    <button className="w-full border-2 border-slate-300 text-slate-600 px-8 py-4 rounded-xl hover:bg-slate-50 transition-colors text-lg font-medium">
+                      From $99
+                    </button>
+                  </div>
+
+                  {/* Build it myself CTA */}
+                  <div className="bg-transparent rounded-2xl p-8 text-center border border-black min-w-[300px]">
+                    <div className="w-24 h-24 mx-auto mb-6 relative">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Image 
+                          src="/library/robot_4.svg" 
+                          alt="Build it myself" 
+                          width={80} 
+                          height={80}
+                          className="opacity-90" 
+                        />
+                      </div>
+                    </div>
+                    <h3 className="text-2xl font-semibold mb-3">Build it myself</h3>
+                    <p className="text-slate-600 dark:text-slate-400 mb-6 text-lg">No code required</p>
+                    <button className="w-full bg-slate-900 text-white px-8 py-4 rounded-xl hover:bg-slate-800 transition-colors text-lg font-medium">
+                      Free
+                    </button>
                   </div>
                 </div>
-                
-                {/* Section Content Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {searchTasks[section.cardsSource].map((item, index) => (
-                    <TaskCard
-                      key={`${section.id}-${item.id}-${index}`}
-                      id={item.id}
-                      title={item.title}
-                      description={item.description}
-                      date={item.date || ''}
-                      starred={item.starred || false}
-                      runCount={item.run_count}
-                      eval_rating={item.eval_rating}
-                      cost={item.cost}
-                      onClick={() => handleCardClick(item.id)}
-                    />
-                  ))}
-                </div>
+              </>
+            )}
+
+            {/* Only show tasks section if form is not submitted */}
+            {!isFormSubmitted && (
+              <div className="mt-24">
+                {/* Content Sections */}
+                {pageSections.map(section => (
+                  <div key={section.id} className="mb-16">
+                    {/* Section Header */}
+                    <div className="mb-3 flex justify-between">
+                      <h2 className={`text-2xl ${dmSerifDisplay.className} flex items-center`}>
+                        <span className={emojiSilhouette}>{section.emoji}</span>
+                        {section.title}
+                      </h2>
+                      <div className="flex items-center">
+                        <span 
+                          className="text-base text-black text-opacity-70 mt-3"
+                        >
+                          {section.viewAllLink} →
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Section Content Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {searchTasks[section.cardsSource].map((item, index) => (
+                        <TaskCard
+                          key={`${section.id}-${item.id}-${index}`}
+                          id={item.id}
+                          title={item.title}
+                          description={item.description}
+                          date={item.date || ''}
+                          starred={item.starred || false}
+                          runCount={item.run_count}
+                          eval_rating={item.eval_rating}
+                          cost={item.cost}
+                          onClick={() => handleCardClick(item.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </>
         )
 
