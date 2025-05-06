@@ -1,14 +1,55 @@
 'use client'
 
 import { Surface } from '@/components/ui/Surface'
-import { ArrowRight, Clock, Plus, Search, Star, Zap } from 'lucide-react'
+import { ArrowRight, Clock, Heart, Plus, Search, Zap, FileText, Settings, Trash2, ChevronLeft, ChevronRight, Repeat, Star, CircleDollarSign } from 'lucide-react'
 import { DM_Serif_Display } from 'next/font/google'
 import Link from 'next/link'
-import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect, Suspense, useCallback } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { TaskCard } from './components/TaskCard'
 import { customTasks, sampleAutomations, searchTasks, pageSections, TaskItemType, getFavoriteItems, getAutomationsByCategory, getTaskById } from './data/index'
 import { CardDetail } from './components/CardDetail'
+import { AddAutomationModal } from './components/AddAutomationModal'
+import { RunArtifactSidebar } from './components/RunArtifactSidebar'
+
+// Vintage color palette - matching TaskCard.tsx
+const COLORS = {
+  terracotta: '#FAAE88',
+  lightGreen: '#E1EBC9',
+  lightYellow: '#FFF0C4',
+  cream: '#EEDECA',
+  lightGrey: '#FFFFFF',
+} as const;
+
+type ColorKey = keyof typeof COLORS;
+
+// Helper to get deterministic values from a string - matching TaskCard.tsx
+const getHashValue = (str: string, modulus: number): number => {
+  if (str.startsWith('template-') && str.includes('-color-')) {
+    const parts = str.split('-');
+    if (parts.length >= 4) {
+      const templateIndex = parseInt(parts[1], 10);
+      const colorIndex = parseInt(parts[3], 10);
+      return modulus === 4 ? templateIndex : colorIndex;
+    }
+  }
+  
+  if (!str) return 0;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash % modulus);
+};
+
+// Helper to format numbers consistently
+const formatNumber = (num: number): string => {
+  if (num >= 1000) {
+    return `${(num/1000).toFixed(1).replace(/\.0$/, '')}k`;
+  }
+  return num.toString();
+};
 
 // Initialize the DM Serif Display font
 const dmSerifDisplay = DM_Serif_Display({
@@ -65,11 +106,36 @@ const gradientStyles = `
   }
 `
 
-export default function LibraryViewPage() {
+interface RunArtifact {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  timestamp: number;
+  output: string;
+  type: 'file' | 'website' | 'integration' | 'input' | 'code' | 'message' | 'media';
+  metadata?: {
+    fileType?: string;
+    thumbnail?: string;
+    url?: string;
+    platform?: string;
+    summary?: string;
+  };
+  isNew?: boolean;
+}
+
+export default function LibraryView() {
+  const [activeSidebarItem, setActiveSidebarItem] = useState<'browse' | 'mytasks' | 'automations'>('browse');
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 flex">
       <style jsx global>{gradientStyles}</style>
-      <Suspense>
+      <Suspense fallback={
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="animate-pulse">Loading...</div>
+        </div>
+      }>
         <LibraryViewContent />
       </Suspense>
     </div>
@@ -77,6 +143,7 @@ export default function LibraryViewPage() {
 }
 
 function LibraryViewContent() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   
   // Map URL params to sidebar items and get selected card
@@ -92,33 +159,136 @@ function LibraryViewContent() {
     }
   }
 
+  // Initialize state with default values to prevent hydration mismatch
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [activeSidebarItem, setActiveSidebarItem] = useState<'browse' | 'automations' | 'mytasks'>(getInitialSidebarItem())
-  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true)
-  const [runs, setRuns] = useState<any[]>([])
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false)
+  const [runs, setRuns] = useState<{ [type: string]: RunArtifact[] }>({})
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
+  const [isNavigating, setIsNavigating] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  // Use useEffect to handle client-side initialization
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Load run artifacts from localStorage only on client side
+  useEffect(() => {
+    if (!isClient) return;
+    
+    const artifactsStr = localStorage.getItem('runArtifacts');
+    if (artifactsStr) {
+      const loadedRuns = JSON.parse(artifactsStr);
+      const groupedRuns = loadedRuns.reduce((acc: { [type: string]: RunArtifact[] }, run: RunArtifact) => {
+        const { isNew, ...runWithoutNew } = run;
+        if (!acc[run.type]) {
+          acc[run.type] = [];
+        }
+        acc[run.type].unshift(runWithoutNew);
+        return acc;
+      }, {});
+      setRuns(groupedRuns);
+    }
+  }, [isClient]);
+
+  // Listen for new run artifacts
+  useEffect(() => {
+    const handleNewArtifact = (event: CustomEvent<RunArtifact>) => {
+      const newArtifact = event.detail;
+      setRuns(prevRuns => {
+        const newRuns = { ...prevRuns };
+        if (!newRuns[newArtifact.type]) {
+          newRuns[newArtifact.type] = [];
+        }
+        newRuns[newArtifact.type].unshift(newArtifact);
+        // Store updated runs in localStorage
+        const allRuns = Object.values(newRuns).flat();
+        localStorage.setItem('runArtifacts', JSON.stringify(allRuns));
+        return newRuns;
+      });
+      // Keep this - open sidebar when new artifact is added
+      setIsRightSidebarOpen(true);
+    };
+
+    window.addEventListener('runArtifactAdded', handleNewArtifact as EventListener);
+    return () => {
+      window.removeEventListener('runArtifactAdded', handleNewArtifact as EventListener);
+    };
+  }, []);
+
+  // Format timestamp
+  const formatTimestamp = (timestamp: number) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString();
+  };
+
+  // Handle navigation with debounce
+  const handleNavigation = useCallback((path: string, newSidebarItem: 'browse' | 'automations' | 'mytasks') => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+    
+    setActiveSidebarItem(newSidebarItem);
+    
+    // Create URL object to handle query params
+    const url = new URL(window.location.href);
+    // Remove the 'card' parameter
+    url.searchParams.delete('card');
+    
+    // Update the URL based on the new sidebar item
+    switch (newSidebarItem) {
+      case 'mytasks':
+        url.searchParams.set('page', 'your-tasks');
+        break;
+      case 'automations':
+        url.searchParams.set('page', 'automations');
+        break;
+      default:
+        url.searchParams.delete('page');
+    }
+    
+    router.replace(path + url.search);
+    // Reset navigation state after a short delay
+    setTimeout(() => setIsNavigating(false), 100);
+  }, [router, isNavigating]);
 
   // Get selected card from URL
   const selectedCardId = searchParams?.get('card')
   const selectedCard = selectedCardId ? getTaskById(selectedCardId) : undefined
 
+  // Get automation modal state from URL
+  const automationParam = searchParams?.get('automation')
+  const isAddingAutomation = automationParam === 'new' || automationParam?.startsWith('task-')
+  
+  // Extract task ID from the automation parameter
+  const taskId = automationParam?.startsWith('task-') ? automationParam.replace('task-', '') : undefined
+
+  // Handle closing the modal
+  const handleCloseAutomationModal = () => {
+    const url = new URL(window.location.href)
+    url.searchParams.delete('automation')
+    router.push(url.search)
+  }
+
+  // Handle opening the new automation modal
+  const handleNewAutomation = () => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('automation', 'new')
+    router.push(url.search)
+  }
+
   // Handle card selection
   const handleCardClick = (cardId: string) => {
     const url = new URL(window.location.href)
     url.searchParams.set('card', cardId)
-    window.history.pushState({}, '', url)
-    // Force a re-render to show the selected card
-    window.dispatchEvent(new Event('popstate'))
-    // Scroll to top instantly
-    window.scrollTo(0, 0)
+    router.push(url.search)
   }
 
   // Handle card detail close
   const handleCardDetailClose = () => {
     const url = new URL(window.location.href)
     url.searchParams.delete('card')
-    window.history.pushState({}, '', url)
-    // Force a re-render to hide the card detail
-    window.dispatchEvent(new Event('popstate'))
+    router.push(url.search)
   }
 
   // Update URL when sidebar item changes
@@ -147,6 +317,12 @@ function LibraryViewContent() {
     setActiveSidebarItem(getInitialSidebarItem())
   }, [searchParams])
 
+  // Handle clearing run artifacts
+  const handleClearRuns = () => {
+    setRuns({});
+    localStorage.removeItem('runArtifacts');
+  };
+
   // Render content based on active sidebar item
   const renderMainContent = () => {
     // If a card is selected, show the detail view
@@ -164,24 +340,32 @@ function LibraryViewContent() {
         return (
           <>
             {/* Wordware Header */}
-            <div className="flex justify-between items-center mb-8 px-2 py-3">
-              <div className="-ml-2">
+            <div className="flex justify-between items-center mb-8 px-2 pt-1 pb-2">
+              <div className="-ml-2 flex items-center gap-1">
+                <div className="flex items-center gap-1">
+                  <span className={`${dmSerifDisplay.className} text-4xl`}>Tasks</span>
+                  <span className="text-sm text-slate-600 mt-[11px] ml-[3px]">by</span>
+                </div>
                 <img 
                   src="https://cdn.prod.website-files.com/66e00503e1e57f5fafdfa7d5/66e005da47c0c33bca665c3a_wordware-logotype.svg" 
                   alt="Wordware" 
-                  className="h-5" 
+                  className="h-3 mt-[11px]" 
                 />
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center mt-[12px]">
                 <div className="flex items-center space-x-7 text-sm mr-8">
-                  <span className="text-slate-700 hover:text-slate-900 cursor-pointer">Docs</span>
                   <span className="text-slate-700 hover:text-slate-900 cursor-pointer">Pricing</span>
-                  <span className="text-slate-700 hover:text-slate-900 cursor-pointer">About us</span>
+                  <span 
+                    className="text-slate-700 hover:text-slate-900 cursor-pointer"
+                    onClick={() => {
+                      window.location.href = '/library-view/company';
+                    }}
+                  >Company & News</span>
                 </div>
                 <div className="flex items-center space-x-6">
                   <span className="text-slate-700 text-sm hover:text-slate-900 cursor-pointer">Sign in</span>
                   <button className="bg-[#0F172A] text-white px-4 py-2 rounded text-sm flex items-center">
-                    Sign Up <ArrowRight className="w-3 h-3 ml-1" />
+                    Build Your Own <ArrowRight className="w-3 h-3 ml-1" />
                   </button>
                 </div>
               </div>
@@ -198,7 +382,7 @@ function LibraryViewContent() {
             <div className="max-w-2xl mx-auto mb-32 relative">
               <input
                 type="text"
-                placeholder="Your AI Task..."
+                placeholder="Describe an AI Task..."
                 className="w-full pl-6 pr-14 py-4 border border-slate-300 dark:border-slate-600 rounded-full bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
               />
               <button className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black dark:bg-white rounded-full flex items-center justify-center">
@@ -210,8 +394,8 @@ function LibraryViewContent() {
             {pageSections.map(section => (
               <div key={section.id} className="mb-16">
                 {/* Section Header */}
-                <div className="mb-4 flex justify-between">
-                  <h2 className={`text-3xl ${dmSerifDisplay.className} flex items-center`}>
+                <div className="mb-3 flex justify-between">
+                  <h2 className={`text-2xl ${dmSerifDisplay.className} flex items-center`}>
                     <span className={emojiSilhouette}>{section.emoji}</span>
                     {section.title}
                   </h2>
@@ -258,7 +442,10 @@ function LibraryViewContent() {
               <h1 className={`text-5xl ${dmSerifDisplay.className}`}>
                 Automations
               </h1>
-              <button className="flex items-center bg-[#0F172A] hover:bg-black text-white rounded-md py-2 px-4 mt-2">
+              <button 
+                onClick={handleNewAutomation}
+                className="flex items-center bg-[#0F172A] hover:bg-black text-white rounded-md py-2 px-4 mt-2"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 <span>New Automation</span>
               </button>
@@ -266,8 +453,8 @@ function LibraryViewContent() {
 
             {/* Triggers Section */}
             <div className="mb-12">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-3xl ${dmSerifDisplay.className} flex items-center`}>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className={`text-2xl ${dmSerifDisplay.className} flex items-center`}>
                   <span className={emojiSilhouette}>⚡</span>
                   Triggers
                 </h2>
@@ -282,7 +469,7 @@ function LibraryViewContent() {
                   return (
                     <div key={automation.id} className="flex items-center w-full gap-4">
                       {/* Left side with background - includes both icon and title */}
-                      <div className="flex-shrink-0 bg-slate-50 dark:bg-slate-800 p-4 rounded-l-lg flex items-center justify-between w-[450px]">
+                      <div className="flex-1 bg-slate-50 dark:bg-slate-800 h-[64px] p-4 rounded-[3px] flex items-center justify-between">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 flex items-center justify-center mr-3">
                             {automation.icon === 'notion' && (
@@ -318,19 +505,47 @@ function LibraryViewContent() {
 
                       {/* Right side - Task (Square Card) - match height with left box */}
                       <div className="flex-1 h-[64px] flex">
-                        <Surface className="p-4 flex items-center w-full">
-                          <div className="flex items-center">
-                            {linkedTask && (
-                              <div>
-                                <div className="font-medium">{linkedTask.title}</div>
-                                <div className="text-xs text-slate-500 mt-1 max-w-[300px] truncate">
-                                  {linkedTask.description}
-                                </div>
+                        {linkedTask ? (
+                          <div 
+                            className="w-full rounded-[3px] flex items-center px-4 cursor-pointer hover:opacity-90 transition-opacity"
+                            style={{ 
+                              backgroundColor: (() => {
+                                const colorIndex = getHashValue(linkedTask.id.split('').reverse().join(''), 4);
+                                const colorKeys: ColorKey[] = ['terracotta', 'lightGreen', 'lightYellow', 'cream', 'lightGrey'];
+                                return COLORS[colorKeys[colorIndex] as ColorKey];
+                              })()
+                            }}
+                            onClick={() => handleCardClick(linkedTask.id)}
+                          >
+                            <div className="w-full">
+                              <div className="font-medium text-black">{linkedTask.title}</div>
+                              <div className="flex items-center gap-3 text-xs text-black/70 mt-1">
+                                {linkedTask.run_count && (
+                                  <div className="flex items-center gap-1">
+                                    <Repeat className="w-3.5 h-3.5" />
+                                    <span>{formatNumber(linkedTask.run_count)}</span>
+                                  </div>
+                                )}
+                                {linkedTask.eval_rating && (
+                                  <div className="flex items-center gap-1">
+                                    <Star className="w-3.5 h-3.5" />
+                                    <span>{linkedTask.eval_rating.toFixed(1)}</span>
+                                  </div>
+                                )}
+                                {linkedTask.cost && (
+                                  <div className="flex items-center gap-1">
+                                    <CircleDollarSign className="w-3.5 h-3.5" strokeWidth={1.5} />
+                                    <span>{linkedTask.cost}</span>
+                                  </div>
+                                )}
                               </div>
-                            )}
-                            {!linkedTask && <span className="font-medium">{automation.action}</span>}
+                            </div>
                           </div>
-                        </Surface>
+                        ) : (
+                          <div className="w-full bg-slate-50 dark:bg-slate-800 rounded-[3px] flex items-center px-4">
+                            <span className="font-medium">{automation.action}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -340,8 +555,8 @@ function LibraryViewContent() {
 
             {/* Scheduled Section */}
             <div>
-              <div className="flex items-center justify-between mb-4 pt-6">
-                <h2 className={`text-3xl ${dmSerifDisplay.className} flex items-center`}>
+              <div className="flex items-center justify-between mb-3 pt-6">
+                <h2 className={`text-2xl ${dmSerifDisplay.className} flex items-center`}>
                   <span className={emojiSilhouette}>🌴</span>
                   Scheduled
                 </h2>
@@ -356,7 +571,7 @@ function LibraryViewContent() {
                   return (
                     <div key={automation.id} className="flex items-center w-full gap-4">
                       {/* Left side with background - includes both icon and title */}
-                      <div className="flex-shrink-0 bg-slate-50 dark:bg-slate-800 p-4 rounded-l-lg flex items-center justify-between w-[450px]">
+                      <div className="flex-1 bg-slate-50 dark:bg-slate-800 h-[64px] p-4 rounded-[3px] flex items-center justify-between">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 flex items-center justify-center mr-3">
                             {automation.icon === 'notion' && (
@@ -392,19 +607,47 @@ function LibraryViewContent() {
 
                       {/* Right side - Task (Square Card) - match height with left box */}
                       <div className="flex-1 h-[64px] flex">
-                        <Surface className="p-4 flex items-center w-full">
-                          <div className="flex items-center">
-                            {linkedTask && (
-                              <div>
-                                <div className="font-medium">{linkedTask.title}</div>
-                                <div className="text-xs text-slate-500 mt-1 max-w-[300px] truncate">
-                                  {linkedTask.description}
-                                </div>
+                        {linkedTask ? (
+                          <div 
+                            className="w-full rounded-[3px] flex items-center px-4 cursor-pointer hover:opacity-90 transition-opacity"
+                            style={{ 
+                              backgroundColor: (() => {
+                                const colorIndex = getHashValue(linkedTask.id.split('').reverse().join(''), 4);
+                                const colorKeys: ColorKey[] = ['terracotta', 'lightGreen', 'lightYellow', 'cream', 'lightGrey'];
+                                return COLORS[colorKeys[colorIndex] as ColorKey];
+                              })()
+                            }}
+                            onClick={() => handleCardClick(linkedTask.id)}
+                          >
+                            <div className="w-full">
+                              <div className="font-medium text-black">{linkedTask.title}</div>
+                              <div className="flex items-center gap-3 text-xs text-black/70 mt-1">
+                                {linkedTask.run_count && (
+                                  <div className="flex items-center gap-1">
+                                    <Repeat className="w-3.5 h-3.5" />
+                                    <span>{formatNumber(linkedTask.run_count)}</span>
+                                  </div>
+                                )}
+                                {linkedTask.eval_rating && (
+                                  <div className="flex items-center gap-1">
+                                    <Star className="w-3.5 h-3.5" />
+                                    <span>{linkedTask.eval_rating.toFixed(1)}</span>
+                                  </div>
+                                )}
+                                {linkedTask.cost && (
+                                  <div className="flex items-center gap-1">
+                                    <CircleDollarSign className="w-3.5 h-3.5" strokeWidth={1.5} />
+                                    <span>{linkedTask.cost}</span>
+                                  </div>
+                                )}
                               </div>
-                            )}
-                            {!linkedTask && <span className="font-medium">{automation.action}</span>}
+                            </div>
                           </div>
-                        </Surface>
+                        ) : (
+                          <div className="w-full bg-slate-50 dark:bg-slate-800 rounded-[3px] flex items-center px-4">
+                            <span className="font-medium">{automation.action}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -444,14 +687,14 @@ function LibraryViewContent() {
               </h1>
               <button className="flex items-center bg-[#0F172A] hover:bg-black text-white rounded-md py-2 px-4 mt-2">
                 <Plus className="w-4 h-4 mr-2" />
-                <span>New Task</span>
+                <span>Open in Studio</span>
               </button>
             </div>
             
             {/* Custom Tasks Section */}
             <div className="mb-16">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-3xl ${dmSerifDisplay.className} flex items-center`}>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className={`text-2xl ${dmSerifDisplay.className} flex items-center`}>
                   <span className={emojiSilhouette}>✏️</span>
                   Custom Tasks
                 </h2>
@@ -485,9 +728,9 @@ function LibraryViewContent() {
             {/* Favorite Tasks Section */}
             {favoriteItems.length > 0 && (
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className={`text-3xl ${dmSerifDisplay.className} flex items-center`}>
-                    <span className={emojiSilhouette}>⭐</span>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className={`text-2xl ${dmSerifDisplay.className} flex items-center`}>
+                    <span className={emojiSilhouette}>❤️</span>
                     Favorite Tasks
                   </h2>
                 </div>
@@ -535,10 +778,7 @@ function LibraryViewContent() {
                 ? 'bg-indigo-600 text-white' 
                 : 'text-gray-400 hover:text-white hover:bg-[#1e1e2e]'
             }`}
-            onClick={() => {
-              setActiveSidebarItem('browse');
-              handleCardDetailClose();
-            }}
+            onClick={() => handleNavigation('/library-view', 'browse')}
             title="Browse"
           >
             <Search className="w-5 h-5" />
@@ -550,13 +790,10 @@ function LibraryViewContent() {
                 ? 'bg-indigo-600 text-white' 
                 : 'text-gray-400 hover:text-white hover:bg-[#1e1e2e]'
             }`}
-            onClick={() => {
-              setActiveSidebarItem('mytasks');
-              handleCardDetailClose();
-            }}
+            onClick={() => handleNavigation('/library-view', 'mytasks')}
             title="My Tasks"
           >
-            <Star className="w-5 h-5" />
+            <Heart className="w-5 h-5" />
           </button>
           
           <button 
@@ -565,49 +802,72 @@ function LibraryViewContent() {
                 ? 'bg-indigo-600 text-white' 
                 : 'text-gray-400 hover:text-white hover:bg-[#1e1e2e]'
             }`}
-            onClick={() => {
-              setActiveSidebarItem('automations');
-              handleCardDetailClose();
-            }}
+            onClick={() => handleNavigation('/library-view', 'automations')}
             title="Automations"
           >
             <Zap className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Spacer */}
+        <div className="flex-1"></div>
+
+        {/* Bottom Icons */}
+        <div className="flex flex-col items-center space-y-4 mb-4">
+          <button 
+            className="w-10 h-10 rounded-md flex items-center justify-center transition-colors text-gray-400 hover:text-white hover:bg-[#1e1e2e]"
+            onClick={() => handleNavigation('/library-view/company', 'browse')}
+            title="News & Company"
+          >
+            <FileText className="w-5 h-5" />
+          </button>
+          
+          <button 
+            className="w-10 h-10 rounded-md flex items-center justify-center transition-colors text-gray-400 hover:text-white hover:bg-[#1e1e2e]"
+            onClick={() => {
+              // Handle settings click
+            }}
+            title="Settings"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 pt-6 pl-0 overflow-hidden bg-[#F8F5EB] pr-[288px] ml-16">
+      <div className={`flex-1 pt-6 pl-0 overflow-hidden bg-[#F8F5EB] ml-16 transition-all duration-300 ${isRightSidebarOpen ? 'pr-[384px]' : 'pr-[40px]'}`}>
         <div className="max-w-5xl mx-auto pb-16">
           {renderMainContent()}
         </div>
       </div>
 
-      {/* Right Sidebar for Runs */}
-      {isRightSidebarOpen && (
-        <div className="w-72 border-l border-slate-700 bg-slate-800 text-slate-200 shrink-0 h-screen fixed right-0 overflow-hidden flex flex-col">
-          <div className="p-4 flex-1 overflow-y-auto">
-            {runs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-center h-full">
-                <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center mb-4">
-                  <Clock className="w-6 h-6 text-slate-400" />
-                </div>
-                <h3 className="text-sm font-medium mb-2 text-slate-200">No completed tasks yet</h3>
-                <p className="text-xs text-slate-400">
-                  Run a task to see the results here
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {runs.map(run => (
-                  <div key={run.id} className="p-3 bg-slate-700 rounded-md shadow-sm">
-                    {/* Run content would go here */}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+      {/* Right Sidebar Toggle Button */}
+      <button 
+        onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+        className={`fixed z-20 top-6 transition-all duration-300 ${
+          isRightSidebarOpen 
+            ? 'right-[388px] -mr-3' 
+            : 'right-[12px] -mr-3'
+        }`}
+      >
+        <div className="w-6 h-12 bg-slate-800 rounded-l-full flex items-center justify-center text-slate-300 hover:text-white transition-colors">
+          {isRightSidebarOpen ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </div>
+      </button>
+
+      {/* Right Sidebar for Runs */}
+      <RunArtifactSidebar
+        isOpen={isRightSidebarOpen}
+        runs={runs}
+        onClearRuns={handleClearRuns}
+      />
+
+      {/* Add Automation Modal */}
+      {isAddingAutomation && (
+        <AddAutomationModal
+          taskId={taskId}
+          onClose={handleCloseAutomationModal}
+        />
       )}
     </>
   )

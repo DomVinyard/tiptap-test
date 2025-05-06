@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DM_Sans, DM_Serif_Display } from 'next/font/google';
 import { DM_Mono } from 'next/font/google';
-import { Star, Clock, Repeat, X, Play } from 'lucide-react';
-import { FaCoins } from 'react-icons/fa';
+import { Star, Repeat, Play, Zap, Heart, Pencil, CircleDollarSign, FileText } from 'lucide-react';
+import { X as XIcon } from 'lucide-react';
 import { TaskItemType } from '../data/index';
 import { TaskCard } from './TaskCard';
 import { searchTasks } from '../data/tasks';
+import { useRouter } from 'next/navigation';
 
 // Initialize DM Serif Display font
 const dmSerifDisplay = DM_Serif_Display({
@@ -82,7 +83,211 @@ const getRandomTask = (excludeCategory: string): TaskItemType => {
 // Add a CSS class for emoji silhouettes - matching the page.tsx style
 const emojiSilhouette = "inline-block mr-4 text-2xl opacity-60 [filter:brightness(0)_contrast(1)_saturate(0)]"
 
+// Helper to format numbers consistently
+const formatNumber = (num: number): string => {
+  if (num >= 1000) {
+    return `${(num/1000).toFixed(1).replace(/\.0$/, '')}k`;
+  }
+  return num.toString();
+};
+
+interface RunArtifact {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  timestamp: number;
+  output: string;
+  type: 'file' | 'website' | 'integration' | 'input' | 'code' | 'message' | 'media';
+  metadata?: {
+    fileType?: string;
+    thumbnail?: string;
+    url?: string;
+    platform?: string;
+    summary?: string;
+  };
+  isNew?: boolean;
+}
+
 export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardClick }) => {
+  const router = useRouter();
+  const [formValues, setFormValues] = useState<{ [key: string]: string }>({});
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Clear form values when task changes
+  useEffect(() => {
+    if (isClient) {
+      setFormValues({});
+    }
+  }, [task.id, isClient]);
+
+  // Handle favorite toggle
+  const handleFavoriteToggle = () => {
+    if (isClient) {
+      setIsFavorited(!isFavorited);
+    }
+  };
+
+  // Handle edit click
+  const handleEditClick = () => {
+    if (isClient) {
+      alert('Open in Studio');
+    }
+  };
+
+  // Helper to check if form has values
+  const hasFormValues = () => {
+    if (!task.form?.fields) return true;
+    return task.form.fields.some((field, index) => formValues[index]);
+  };
+
+  // Helper to load demo values
+  const loadDemoValues = () => {
+    if (task.form?.fields) {
+      const newValues: Record<number, string> = {};
+      task.form.fields.forEach((field, index) => {
+        if (field.demo_value) {
+          newValues[index] = field.demo_value;
+        }
+      });
+      setFormValues(newValues);
+    }
+  };
+
+  // Handle automation click
+  const handleAutomateClick = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', 'automations');
+    url.searchParams.set('automation', `task-${task.id}`);
+    router.push(url.search);
+  };
+
+  // Handle run task
+  const handleRunTask = () => {
+    // If form is empty, populate with demo values
+    if (!hasFormValues()) {
+      loadDemoValues();
+      return;
+    }
+
+    // Get demo output based on task type
+    const getDemoOutput = (): {
+      type: 'file' | 'website' | 'integration' | 'input' | 'code' | 'message' | 'media';
+      output: string;
+      metadata?: {
+        fileType?: string;
+        thumbnail?: string;
+        url?: string;
+        platform?: string;
+        summary?: string;
+      };
+    } => {
+      if (task.demo_output) {
+        return task.demo_output;
+      }
+
+      // Default demo outputs based on task type
+      switch (task.output_type) {
+        case 'file':
+          return {
+            type: 'file',
+            output: 'https://example.com/report.xlsx',
+            metadata: {
+              fileType: 'Excel Report',
+              summary: 'Monthly analytics report'
+            }
+          };
+        case 'website':
+          return {
+            type: 'website',
+            output: 'https://preview.example.com/generated-site',
+            metadata: {
+              thumbnail: '/demo/website-preview.png',
+              url: 'https://preview.example.com/generated-site'
+            }
+          };
+        case 'integration':
+          return {
+            type: 'integration',
+            output: 'Updated 3 platforms:\nNotion page created\nSlack notification sent\nCalendar event added',
+            metadata: {
+              platform: 'multi-platform'
+            }
+          };
+        case 'input':
+          return {
+            type: 'input',
+            output: 'Please review the generated content and approve or suggest changes.',
+            metadata: {
+              summary: 'Human review required'
+            }
+          };
+        case 'code':
+          return {
+            type: 'code',
+            output: JSON.stringify({ status: 'success', data: { key: 'value' }}, null, 2),
+            metadata: {
+              summary: 'API Response'
+            }
+          };
+        case 'message':
+          return {
+            type: 'message',
+            output: 'Your weekly newsletter has been generated and scheduled.',
+            metadata: {
+              platform: 'Email',
+              summary: 'Newsletter scheduled'
+            }
+          };
+        case 'media':
+          return {
+            type: 'media',
+            output: '/demo/generated-image.png',
+            metadata: {
+              summary: 'AI-generated visualization'
+            }
+          };
+        default:
+          return {
+            type: 'message',
+            output: 'Task completed successfully'
+          };
+      }
+    };
+
+    // Create new artifact with demo output
+    const demoOutput = getDemoOutput();
+    const newArtifact: RunArtifact = {
+      id: Math.random().toString(36).substring(7),
+      taskId: task.id,
+      taskTitle: task.title,
+      timestamp: Date.now(),
+      output: demoOutput.output,
+      type: demoOutput.type,
+      metadata: demoOutput.metadata,
+      isNew: true
+    };
+
+    // Dispatch event for new artifact
+    const event = new CustomEvent('runArtifactAdded', { detail: newArtifact });
+    window.dispatchEvent(event);
+
+    // Clear form after creating artifact
+    setFormValues({});
+  };
+
+  // Handle field change
+  const handleFieldChange = (index: number, value: string) => {
+    setFormValues(prev => ({
+      ...prev,
+      [index]: value
+    }));
+  };
+
   // Determine the border color based on the task id
   const getCardColor = (id: string): string => {
     if (task.lastEdited) return COLORS.lightGrey;
@@ -106,44 +311,86 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
   return (
     <div>
       <div 
-        className="bg-white mb-8 mt-8"
+        className="bg-white mb-8 mt-0 relative"
         style={{
           border: `16px solid ${borderColor}`,
           borderRadius: '3px',
-          transition: 'transform 500ms ease-out'
+          transition: isClient ? 'transform 500ms ease-out' : 'none'
         }}
       >
-        {/* Header with colored background */}
-        <div 
-          className="flex justify-between items-start relative"
-          style={{
-            backgroundColor: borderColor,
-            margin: '-16px -16px 40px -16px',
-          }}
-        >
-          <div className="w-full flex justify-between items-center">
-            <div className="flex items-center gap-2 pl-4 py-4">
-              <h1 className={`text-sm ${dmMono.className} opacity-90 font-medium`}>{task.title}</h1>
-              {task.author && (
-                <span className={`text-sm ${dmMono.className} opacity-60`}>
-                  by {task.author}
-                </span>
-              )}
-            </div>
-          </div>
+        {/* Close button moved to match other icons */}
+        <div className="absolute top-1.5 right-0 flex items-center gap-2">
           <button 
-            onClick={onClose}
-            className="text-black opacity-90 hover:opacity-100 transition-opacity absolute top-1/2 -translate-y-1/2 right-3"
+            className="p-1.5 hover:bg-black/5 rounded-md transition-colors"
+            onClick={handleFavoriteToggle}
           >
-            <X className="w-6 h-6" strokeWidth={2.5} />
+            <Heart 
+              className="w-5 h-5 text-black" 
+              strokeWidth={1.5}
+              fill={isFavorited ? "currentColor" : "none"}
+            />
+          </button>
+          <button 
+            className="p-1.5 hover:bg-black/5 rounded-md transition-colors"
+            onClick={handleEditClick}
+          >
+            <Pencil className="w-5 h-5 text-black" strokeWidth={1.5} />
+          </button>
+          <button 
+            onClick={() => {
+              window.location.href = window.location.pathname;
+            }}
+            className="p-1.5 hover:bg-black/5 rounded-md transition-colors"
+          >
+            <XIcon className="w-[28px] h-[28px] text-black" strokeWidth={1.2} />
           </button>
         </div>
 
+        {/* Task Information Section - Now at top */}
+        <div style={{ backgroundColor: borderColor }}>
+          <div className="px-0 pt-1 pb-5 flex justify-between items-start">
+            <div className="pl-0">
+              <h2 className={`text-3xl ${dmSerifDisplay.className} mb-2`}>{task.title}</h2>
+              <div className="flex items-center gap-3 text-xs text-black">
+                {task.run_count && (
+                  <div className="flex items-center gap-1">
+                    <Repeat className="w-3.5 h-3.5" />
+                    <span>{formatNumber(task.run_count)}</span>
+                  </div>
+                )}
+                {task.eval_rating && (
+                  <div className="flex items-center gap-1">
+                    <Star className="w-3.5 h-3.5" />
+                    <span>{task.eval_rating.toFixed(1)} rating</span>
+                  </div>
+                )}
+                {task.author && (
+                  <div className="flex items-center gap-1">
+                    <div className="w-3.5 h-3.5 rounded-full bg-white/80 flex items-center justify-center">
+                      <span className="text-black text-[10px]">
+                        {task.author.charAt(0)}
+                      </span>
+                    </div>
+                    <span>{task.author}</span>
+                    {task.version && (
+                      <span className="text-black">· v{task.version}</span>
+                    )}
+                  </div>
+                )}
+                <div className="flex items-center gap-1">
+                  <CircleDollarSign className="w-3.5 h-3.5" strokeWidth={1.5} />
+                  <span>{task.cost}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Main content container with consistent max-width */}
-        <div className="max-w-3xl mx-auto px-8 pt-8 pb-16">
+        <div className="max-w-4xl mx-auto pt-12 pb-12">
           {/* Form Fields */}
           {task.form?.fields && (
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               {task.form.fields.map((field, index) => (
                 <div key={index} className="pb-4">
                   {/* Only show field if it has an input type or description */}
@@ -151,7 +398,7 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
                     <>
                       {/* Field Label */}
                       <div className="mb-2">
-                        <h3 className={`text-2xl font-bold ${dmSans.className}`}>
+                        <h3 className={`text-xl font-bold ${dmSans.className}`}>
                           {field.label}
                           {field.required && <span className="text-red-500 ml-1">*</span>}
                         </h3>
@@ -163,14 +410,28 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
                           <div className="mt-3 flex justify-center rounded-lg border border-dashed border-slate-300 px-6 py-10 bg-slate-50">
                             <div className="text-center">
                               <div className="mt-1 flex text-sm leading-6 text-slate-600">
-                                <label
-                                  className="relative cursor-pointer rounded-md font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                                >
-                                  <span>Upload a file</span>
-                                  <input type="file" className="sr-only" />
-                                </label>
-                                <p className="pl-1">or drag and drop</p>
+                                {!formValues[index] && (
+                                  <>
+                                    <label
+                                      className="relative cursor-pointer rounded-md font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                                    >
+                                      <span>Upload a file</span>
+                                      <input 
+                                        type="file" 
+                                        className="sr-only" 
+                                        onChange={(e) => handleFieldChange(index, e.target.value)}
+                                      />
+                                    </label>
+                                    <p className="pl-1">or drag and drop</p>
+                                  </>
+                                )}
                               </div>
+                              {formValues[index] && (
+                                <div className="flex items-center justify-center gap-3 text-slate-600">
+                                  <FileText className="w-6 h-6" strokeWidth={1.5} />
+                                  <p className="text-base">{formValues[index]}</p>
+                                </div>
+                              )}
                             </div>
                           </div>
                           {field.description && (
@@ -185,7 +446,9 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
                         <>
                           <div className="relative">
                             <select 
-                              className="mt-3 block w-full appearance-none bg-white rounded-md border border-slate-300 px-4 py-2 pr-8 text-base focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent"
+                              className="mt-3 block w-full appearance-none bg-slate-50 rounded-md border border-slate-300 px-4 py-2 pr-8 text-base focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent"
+                              value={formValues[index] || ''}
+                              onChange={(e) => handleFieldChange(index, e.target.value)}
                             >
                               <option value="">Select an option</option>
                               {field.options.map((option, optionIndex) => (
@@ -211,6 +474,8 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
                           <input
                             type="text"
                             placeholder={field.placeholder}
+                            value={formValues[index] || ''}
+                            onChange={(e) => handleFieldChange(index, e.target.value)}
                             className="mt-3 block w-full rounded-md border-0 px-4 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                           />
                           {field.description && (
@@ -226,6 +491,8 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
                           <textarea
                             rows={4}
                             placeholder={field.placeholder}
+                            value={formValues[index] || ''}
+                            onChange={(e) => handleFieldChange(index, e.target.value)}
                             className="mt-3 block w-full rounded-md border-0 px-4 py-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-base leading-6"
                           />
                           {field.description && (
@@ -237,7 +504,7 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
                       )}
                     </>
                   ) : (
-                    <h3 className={`text-2xl font-bold ${dmSans.className}`}>
+                    <h3 className={`text-xl font-bold ${dmSans.className}`}>
                       {field.label}
                     </h3>
                   )}
@@ -245,33 +512,36 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
               ))}
             </div>
           )}
+        </div>
 
-          {/* Run Button Section */}
-          <div className="mt-8 flex justify-end items-center">
-            {/* Cost Indicator */}
-            <div className="flex items-center gap-1.5 mr-4">
-              <FaCoins size={16} className="text-black" />
-              <div className={`text-base ${dmMono.className} text-black font-medium`}>
-                {task.cost}
-              </div>
-            </div>
-            
-            {/* Run Button */}
+        {/* Footer Section */}
+        <div style={{ backgroundColor: borderColor }}>
+          <div className="px-0 pt-3 pb-0 flex justify-end items-center gap-5">
             <button 
-              className="bg-black text-white px-6 py-3 rounded-md flex items-center gap-2 hover:bg-slate-800 transition-colors"
-              onClick={() => {/* Handle run */}}
+              className="text-black hover:text-black/80 rounded-md flex items-center gap-2 transition-colors mr-4"
+              onClick={handleAutomateClick}
             >
-              <Play className="w-4 h-4" fill="currentColor" />
-              <span className="font-medium">Run Task</span>
+              <Zap className="w-4 h-4" fill="currentColor" />
+              <span className="font-medium">Automate Task</span>
             </button>
+            
+            <div className="pr-0">
+              <button 
+                className="bg-black text-white px-5 py-2.5 rounded-md flex items-center gap-2 hover:bg-slate-800 transition-colors"
+                onClick={handleRunTask}
+              >
+                <Play className="w-4 h-4" fill="currentColor" />
+                <span className="font-medium">Run Task</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Similar Tasks Section */}
       {taskCategory && (similarTasks.length > 0 || randomTask) && (
-        <div className="mt-12">
-          <h2 className={`text-3xl ${dmSerifDisplay.className} flex items-center mb-4`}>
+        <div className="mt-24">
+          <h2 className={`text-2xl ${dmSerifDisplay.className} flex items-center mb-4`}>
             <span className={emojiSilhouette}>🔍</span>
             Similar Tasks
           </h2>

@@ -14,6 +14,18 @@ export interface TaskItemType {
   run_count?: number;
   eval_rating?: number;
   cost: number;  // 1-5 integer representing cost level
+  output_type?: 'file' | 'website' | 'integration' | 'input' | 'code' | 'message' | 'media';
+  demo_output?: {
+    type: 'file' | 'website' | 'integration' | 'input' | 'code' | 'message' | 'media';
+    output: string;
+    metadata?: {
+      fileType?: string;
+      thumbnail?: string;
+      url?: string;
+      platform?: string;
+      summary?: string;
+    };
+  };
   form?: {
     fields: {
       label: string;
@@ -22,6 +34,7 @@ export interface TaskItemType {
       options?: string[];
       description?: string;
       required?: boolean;
+      demo_value?: string; // Add demo value for form field
     }[];
   };
 }
@@ -39,13 +52,22 @@ export const searchTasks = {
       run_count: 189542,
       eval_rating: 4.8,
       cost: 3,
+      demo_output: {
+        type: 'file' as const,
+        output: 'categorized-invoices-2024-q1.xlsx',
+        metadata: {
+          fileType: 'Excel Spreadsheet',
+          summary: 'Categorized invoices with vendor analysis'
+        }
+      },
       form: {
         fields: [
           {
-            label: 'Analyze this CSV File.',
+            label: 'To categorize your invoices by vendor and expense type, first upload your invoice data.',
             type: 'file' as const,
-            description: 'Upload your invoice data in CSV format',
-            required: true
+            description: 'CSV file containing invoice details',
+            required: true,
+            demo_value: 'invoices-2024-q1.csv'
           },
           {
             label: 'Next, automatically apply this category style to each row.',
@@ -57,10 +79,12 @@ export const searchTasks = {
               'Cost center',
               'Custom categories'
             ],
-            required: true
+            required: true,
+            demo_value: 'Department'
           },
           {
-            label: 'Finally, generate a CSV file with the correct categories appended.'
+            label: 'Finally, generate a CSV file with the correct categories appended.',
+            demo_value: 'categorized-invoices-2024-q1.csv'
           }
         ]
       }
@@ -75,13 +99,18 @@ export const searchTasks = {
       run_count: 156731,
       eval_rating: 4.6,
       cost: 2,
+      demo_output: {
+        type: 'message' as const,
+        output: 'Dear valued partner,\n\nThis is a friendly reminder that invoice #INV-2024-0123 for $12,500 is currently outstanding. Payment was due on March 15, 2024.\n\nPlease note our new wire transfer details effective April 1st, 2024.\n\nBest regards,\nAccounts Receivable Team'
+      },
       form: {
         fields: [
           {
-            label: 'Upload your accounts receivable data.',
+            label: 'To generate payment reminders, first upload your accounts receivable data.',
             type: 'file' as const,
             description: 'CSV file containing invoice details and payment status',
-            required: true
+            required: true,
+            demo_value: 'accounts-receivable-march2024.csv'
           },
           {
             label: 'Select your preferred reminder tone.',
@@ -92,16 +121,19 @@ export const searchTasks = {
               'Direct and urgent',
               'Gentle reminder'
             ],
-            required: true
+            required: true,
+            demo_value: 'Friendly but firm'
           },
           {
             label: 'Include any specific payment instructions or notes.',
             type: 'textarea' as const,
             placeholder: 'E.g., Updated banking details or payment methods',
-            required: false
+            required: false,
+            demo_value: 'Please note our new wire transfer details effective April 1st, 2024.'
           },
           {
-            label: 'The system will generate personalized reminder emails for each overdue invoice.'
+            label: 'The system will generate personalized reminder emails for each overdue invoice.',
+            demo_value: 'reminder-emails-batch-march2024.zip'
           }
         ]
       }
@@ -116,13 +148,22 @@ export const searchTasks = {
       run_count: 103451,
       eval_rating: 4.3,
       cost: 2,
+      demo_output: {
+        type: 'file' as const,
+        output: 'q1-2024-expense-summary.pdf',
+        metadata: {
+          fileType: 'PDF Report',
+          summary: 'Expense summary with category breakdown'
+        }
+      },
       form: {
         fields: [
           {
-            label: 'Upload your expense report PDF.',
+            label: 'To create a concise summary of your expense reports, first upload your expense report PDF.',
             type: 'file' as const,
             description: 'Supports standard expense report formats',
-            required: true
+            required: true,
+            demo_value: 'q1-2024-expenses.pdf'
           },
           {
             label: 'Choose the summary format.',
@@ -133,17 +174,20 @@ export const searchTasks = {
               'By project',
               'By department'
             ],
-            required: true
+            required: true,
+            demo_value: 'By category'
           },
           {
             label: 'Set the minimum amount threshold for detailed breakdowns.',
             type: 'text' as const,
             placeholder: 'E.g., 100.00',
             description: 'Expenses above this amount will get detailed explanations',
-            required: false
+            required: false,
+            demo_value: '500.00'
           },
           {
-            label: 'A concise summary report will be generated with key expense insights and patterns.'
+            label: 'A concise summary report will be generated with key expense insights and patterns.',
+            demo_value: 'q1-2024-expense-summary.pdf'
           }
         ]
       }
@@ -157,13 +201,37 @@ export const searchTasks = {
       run_count: 82134,
       eval_rating: 4.7,
       cost: 4,
+      demo_output: {
+        type: 'code' as const,
+        output: `{
+  "anomalies_detected": [
+    {
+      "transaction_id": "TX-2024-985",
+      "amount": 15000,
+      "risk_level": "high",
+      "reason": "Amount 350% above category average",
+      "recommendation": "Review vendor authorization"
+    },
+    {
+      "transaction_id": "TX-2024-986",
+      "amount": 2500,
+      "risk_level": "medium",
+      "reason": "Unusual time pattern detected",
+      "recommendation": "Verify transaction timing"
+    }
+  ],
+  "analysis_period": "Last 90 days",
+  "total_transactions_reviewed": 1542
+}`
+      },
       form: {
         fields: [
           {
-            label: 'Upload your transaction log file.',
+            label: 'To identify unusual patterns in your transactions, first upload your transaction log file.',
             type: 'file' as const,
             description: 'CSV or Excel file containing transaction data',
-            required: true
+            required: true,
+            demo_value: 'march2024-transactions.xlsx'
           },
           {
             label: 'Select the anomaly detection criteria.',
@@ -175,7 +243,8 @@ export const searchTasks = {
               'Vendor/payee patterns',
               'All of the above'
             ],
-            required: true
+            required: true,
+            demo_value: 'All of the above'
           },
           {
             label: 'Define your sensitivity level for anomaly detection.',
@@ -185,7 +254,8 @@ export const searchTasks = {
               'Medium (balanced detection)',
               'Low (flag major anomalies only)'
             ],
-            required: true
+            required: true,
+            demo_value: 'Medium (balanced detection)'
           },
           {
             label: 'Set the date range for historical comparison.',
@@ -197,10 +267,12 @@ export const searchTasks = {
               'Last 365 days',
               'All available data'
             ],
-            required: true
+            required: true,
+            demo_value: 'Last 90 days'
           },
           {
-            label: 'The system will analyze your transactions and generate a detailed report of identified anomalies with risk levels and recommendations.'
+            label: 'The system will analyze your transactions and generate a detailed report of identified anomalies with risk levels and recommendations.',
+            demo_value: 'transaction-anomalies-march2024.pdf'
           }
         ]
       }
@@ -217,10 +289,11 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your tax memo document.',
+            label: 'To simplify your tax memo for better understanding, first upload your tax memo document.',
             type: 'file' as const,
             description: 'PDF or Word document containing tax explanations',
-            required: true
+            required: true,
+            demo_value: 'complex-tax-memo-2024.pdf'
           },
           {
             label: 'Select your target audience.',
@@ -231,7 +304,8 @@ export const searchTasks = {
               'Non-finance professionals',
               'Finance team members'
             ],
-            required: true
+            required: true,
+            demo_value: 'Small business owners'
           },
           {
             label: 'Choose the level of tax terminology to retain.',
@@ -241,10 +315,12 @@ export const searchTasks = {
               'Include common tax terms',
               'Maintain all technical terms with explanations'
             ],
-            required: true
+            required: true,
+            demo_value: 'Keep essential terms only'
           },
           {
-            label: 'A simplified version of your tax memo will be generated, maintaining accuracy while improving readability.'
+            label: 'A simplified version of your tax memo will be generated, maintaining accuracy while improving readability.',
+            demo_value: 'simplified-tax-memo-2024.pdf'
           }
         ]
       }
@@ -261,7 +337,7 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your financial summary.',
+            label: 'To convert your technical financial summary into plain English, first upload your financial summary.',
             type: 'file' as const,
             description: 'PDF, Excel, or Word document containing financial data and analysis',
             required: true
@@ -312,13 +388,23 @@ export const searchTasks = {
       run_count: 201643,
       eval_rating: 4.9,
       cost: 4,
+      demo_output: {
+        type: 'website' as const,
+        output: 'https://contracts.example.com/summary/2024-03-15',
+        metadata: {
+          url: 'https://contracts.example.com/summary/2024-03-15',
+          thumbnail: '/contract-summary-preview.png',
+          summary: 'Interactive contract summary with key terms highlighted'
+        }
+      },
       form: {
         fields: [
           {
-            label: 'Upload your contract document.',
+            label: 'To extract key points from your contract, first upload your contract document.',
             type: 'file' as const,
             description: 'PDF or Word document containing the contract',
-            required: true
+            required: true,
+            demo_value: 'service-agreement-2024.pdf'
           },
           {
             label: 'Select the contract type.',
@@ -331,7 +417,8 @@ export const searchTasks = {
               'Partnership agreement',
               'Other (specify below)'
             ],
-            required: true
+            required: true,
+            demo_value: 'Service agreement'
           },
           {
             label: 'Specify focus areas for analysis.',
@@ -344,13 +431,15 @@ export const searchTasks = {
               'Liability and indemnification',
               'Custom selection'
             ],
-            required: true
+            required: true,
+            demo_value: 'All key terms'
           },
           {
             label: 'Additional terms or clauses to highlight.',
             type: 'textarea' as const,
             placeholder: 'Enter specific terms or clauses you want to emphasize',
-            required: false
+            required: false,
+            demo_value: 'Data protection requirements, Service level agreements'
           },
           {
             label: 'Choose summary format.',
@@ -361,10 +450,12 @@ export const searchTasks = {
               'Timeline of obligations',
               'Risk assessment format'
             ],
-            required: true
+            required: true,
+            demo_value: 'Executive summary'
           },
           {
-            label: 'A comprehensive contract summary will be generated, highlighting key terms, obligations, and potential risks.'
+            label: 'A comprehensive contract summary will be generated, highlighting key terms, obligations, and potential risks.',
+            demo_value: 'contract-summary-report.pdf'
           }
         ]
       }
@@ -381,10 +472,11 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your lease agreement.',
+            label: 'To identify important clauses in your lease agreement, first upload your lease agreement.',
             type: 'file' as const,
             description: 'PDF or Word document containing the lease',
-            required: true
+            required: true,
+            demo_value: 'office-lease-2024.pdf'
           },
           {
             label: 'Select the type of lease.',
@@ -396,7 +488,8 @@ export const searchTasks = {
               'Vehicle lease',
               'Other (specify below)'
             ],
-            required: true
+            required: true,
+            demo_value: 'Commercial property'
           },
           {
             label: 'Choose clause categories to analyze.',
@@ -409,16 +502,19 @@ export const searchTasks = {
               'Default and remedies',
               'Custom selection'
             ],
-            required: true
+            required: true,
+            demo_value: 'All standard clauses'
           },
           {
             label: 'Specify any additional terms to flag.',
             type: 'textarea' as const,
             placeholder: 'Enter specific terms or conditions to highlight',
-            required: false
+            required: false,
+            demo_value: 'Property improvements, Sublease conditions, Early termination'
           },
           {
-            label: 'The system will analyze your lease agreement and provide a detailed breakdown of important clauses with risk assessments.'
+            label: 'The system will analyze your lease agreement and provide a detailed breakdown of important clauses with risk assessments.',
+            demo_value: 'lease-analysis-report.pdf'
           }
         ]
       }
@@ -431,7 +527,46 @@ export const searchTasks = {
       starred: false,
       run_count: 173492,
       eval_rating: 4.6,
-      cost: 2
+      cost: 2,
+      form: {
+        fields: [
+          {
+            label: 'To simplify your legal document for better understanding, first upload your legal document.',
+            type: 'file' as const,
+            description: 'PDF or Word document containing legal text',
+            required: true,
+            demo_value: 'complex-legal-document-2024.pdf'
+          },
+          {
+            label: 'Select target audience.',
+            type: 'select' as const,
+            options: [
+              'General public',
+              'Business clients',
+              'Technical users',
+              'Mixed audience'
+            ],
+            required: true,
+            demo_value: 'General public'
+          },
+          {
+            label: 'Choose simplification level.',
+            type: 'select' as const,
+            options: [
+              'Maximum simplification',
+              'Balanced approach',
+              'Light simplification',
+              'Technical terms explained'
+            ],
+            required: true,
+            demo_value: 'Balanced approach'
+          },
+          {
+            label: 'The system will generate a simplified version of your legal document that maintains accuracy while improving readability.',
+            demo_value: 'simplified-legal-document-2024.pdf'
+          }
+        ]
+      }
     },
     {
       id: 'legal4',
@@ -441,7 +576,46 @@ export const searchTasks = {
       starred: false,
       run_count: 87234,
       eval_rating: 4.4,
-      cost: 3
+      cost: 3,
+      form: {
+        fields: [
+          {
+            label: 'Upload your NDA document.',
+            type: 'file' as const,
+            description: 'PDF or Word document containing the NDA',
+            required: true,
+            demo_value: 'contractor-nda-draft.pdf'
+          },
+          {
+            label: 'Select NDA type.',
+            type: 'select' as const,
+            options: [
+              'One-way NDA',
+              'Mutual NDA',
+              'Employee NDA',
+              'Contractor NDA'
+            ],
+            required: true,
+            demo_value: 'Contractor NDA'
+          },
+          {
+            label: 'Choose industry context.',
+            type: 'select' as const,
+            options: [
+              'Technology',
+              'Healthcare',
+              'Financial services',
+              'General business'
+            ],
+            required: true,
+            demo_value: 'Technology'
+          },
+          {
+            label: 'The system will analyze your NDA and identify any missing standard terms or potential issues.',
+            demo_value: 'nda-analysis-report.pdf'
+          }
+        ]
+      }
     },
     {
       id: 'legal5',
@@ -451,7 +625,46 @@ export const searchTasks = {
       starred: false,
       run_count: 74325,
       eval_rating: 4.2,
-      cost: 3
+      cost: 3,
+      form: {
+        fields: [
+          {
+            label: 'Upload your MSA document.',
+            type: 'file' as const,
+            description: 'PDF or Word document containing the MSA',
+            required: true,
+            demo_value: 'enterprise-msa-2024.pdf'
+          },
+          {
+            label: 'Select obligation types to extract.',
+            type: 'select' as const,
+            options: [
+              'All obligations',
+              'Service provider obligations',
+              'Client obligations',
+              'Mutual obligations'
+            ],
+            required: true,
+            demo_value: 'All obligations'
+          },
+          {
+            label: 'Choose output format.',
+            type: 'select' as const,
+            options: [
+              'Timeline view',
+              'Categorized list',
+              'Responsibility matrix',
+              'Summary report'
+            ],
+            required: true,
+            demo_value: 'Responsibility matrix'
+          },
+          {
+            label: 'The system will extract and organize all key obligations from your MSA.',
+            demo_value: 'msa-obligations-matrix.xlsx'
+          }
+        ]
+      }
     },
     {
       id: 'legal6',
@@ -461,7 +674,47 @@ export const searchTasks = {
       starred: false,
       run_count: 63421,
       eval_rating: 4.5,
-      cost: 4
+      cost: 4,
+      form: {
+        fields: [
+          {
+            label: 'Upload your Terms of Service document.',
+            type: 'file' as const,
+            description: 'PDF or Word document containing the Terms of Service',
+            required: true,
+            demo_value: 'platform-tos-2024.docx'
+          },
+          {
+            label: 'Select risk assessment areas.',
+            type: 'select' as const,
+            options: [
+              'All risk areas',
+              'Liability clauses',
+              'User rights',
+              'Data handling',
+              'Dispute resolution'
+            ],
+            required: true,
+            demo_value: 'All risk areas'
+          },
+          {
+            label: 'Choose jurisdiction.',
+            type: 'select' as const,
+            options: [
+              'United States',
+              'European Union',
+              'United Kingdom',
+              'International'
+            ],
+            required: true,
+            demo_value: 'United States'
+          },
+          {
+            label: 'The system will analyze your Terms of Service and identify potentially risky language or missing protections.',
+            demo_value: 'tos-risk-assessment.pdf'
+          }
+        ]
+      }
     }
   ],
   hr: [
@@ -474,13 +727,21 @@ export const searchTasks = {
       run_count: 187392,
       eval_rating: 4.8,
       cost: 2,
+      demo_output: {
+        type: 'integration' as const,
+        output: 'Updated job description in Workday\nSynced changes to LinkedIn job post\nGenerated SEO-optimized version for website',
+        metadata: {
+          platform: 'Workday, LinkedIn'
+        }
+      },
       form: {
         fields: [
           {
-            label: 'Upload your job description document.',
+            label: 'To make your job description more inclusive and appealing, first upload your job description document.',
             type: 'file' as const,
             description: 'PDF or Word document containing the job description',
-            required: true
+            required: true,
+            demo_value: 'senior-developer-job-desc.docx'
           },
           {
             label: 'Select your target inclusivity improvements.',
@@ -492,7 +753,8 @@ export const searchTasks = {
               'Age-neutral phrasing',
               'All of the above'
             ],
-            required: true
+            required: true,
+            demo_value: 'All of the above'
           },
           {
             label: 'Choose the tone for the revised description.',
@@ -503,10 +765,12 @@ export const searchTasks = {
               'Dynamic and energetic',
               'Balanced and neutral'
             ],
-            required: true
+            required: true,
+            demo_value: 'Professional and approachable'
           },
           {
-            label: 'The system will revise your job description to be more inclusive while maintaining your key requirements and qualifications.'
+            label: 'The system will revise your job description to be more inclusive while maintaining your key requirements and qualifications.',
+            demo_value: 'revised-senior-developer-job-desc.docx'
           }
         ]
       }
@@ -523,10 +787,11 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your interview notes.',
+            label: 'To create a structured scorecard from your interview notes, first upload your interview notes.',
             type: 'file' as const,
             description: 'Text, PDF, or Word document containing interview notes',
-            required: true
+            required: true,
+            demo_value: 'candidate-interview-notes-march15.docx'
           },
           {
             label: 'Select the interview evaluation criteria.',
@@ -538,7 +803,8 @@ export const searchTasks = {
               'Experience validation',
               'All standard criteria'
             ],
-            required: true
+            required: true,
+            demo_value: 'All standard criteria'
           },
           {
             label: 'Choose the scorecard format.',
@@ -549,10 +815,12 @@ export const searchTasks = {
               'Hybrid (ratings + comments)',
               'Strengths/Weaknesses format'
             ],
-            required: true
+            required: true,
+            demo_value: 'Hybrid (ratings + comments)'
           },
           {
-            label: 'The system will generate a structured scorecard with ratings and key observations from your interview notes.'
+            label: 'The system will generate a structured scorecard with ratings and key observations from your interview notes.',
+            demo_value: 'candidate-evaluation-march15.pdf'
           }
         ]
       }
@@ -569,7 +837,7 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload employee performance data.',
+            label: 'To generate an objective performance review, first upload your employee performance data.',
             type: 'file' as const,
             description: 'CSV or Excel file containing performance metrics',
             required: true
@@ -626,7 +894,7 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload employee feedback data.',
+            label: 'To organize employee feedback into actionable themes, first upload your employee feedback data.',
             type: 'file' as const,
             description: 'CSV, Excel, or text file containing feedback responses',
             required: true
@@ -678,7 +946,7 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your HR policy document.',
+            label: 'To convert your HR policies into an easy-to-navigate FAQ format, first upload your HR policy document.',
             type: 'file' as const,
             description: 'PDF or Word document containing HR policies',
             required: true
@@ -724,7 +992,7 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your wiki content or onboarding documentation.',
+            label: 'To create a comprehensive onboarding checklist, first upload your wiki content or onboarding documentation.',
             type: 'file' as const,
             description: 'Text, PDF, or Word documents containing onboarding information',
             required: true
@@ -776,14 +1044,22 @@ export const searchTasks = {
       run_count: 195432,
       eval_rating: 4.9,
       cost: 2,
+      demo_output: {
+        type: 'input' as const,
+        output: 'The outline suggests covering "Implementation Challenges" section. Would you like to include common pitfalls from recent case studies?',
+        metadata: {
+          summary: 'User input needed for outline customization'
+        }
+      },
       form: {
         fields: [
           {
-            label: 'Enter your target keywords.',
+            label: 'To create an SEO-optimized blog outline, first enter your target keywords.',
             type: 'textarea' as const,
             placeholder: 'One keyword or phrase per line',
             description: 'Primary and secondary keywords for your blog post',
-            required: true
+            required: true,
+            demo_value: 'artificial intelligence in business\nmachine learning applications\nAI implementation strategy'
           },
           {
             label: 'Select content type.',
@@ -795,7 +1071,8 @@ export const searchTasks = {
               'Product comparison',
               'Industry trends'
             ],
-            required: true
+            required: true,
+            demo_value: 'In-depth analysis'
           },
           {
             label: 'Choose content length.',
@@ -806,10 +1083,12 @@ export const searchTasks = {
               'Long (2500-3000 words)',
               'Comprehensive (3500+ words)'
             ],
-            required: true
+            required: true,
+            demo_value: 'Long (2500-3000 words)'
           },
           {
-            label: 'The system will generate an SEO-optimized outline with section headings, key points, and suggested word counts.'
+            label: 'The system will generate an SEO-optimized outline with section headings, key points, and suggested word counts.',
+            demo_value: 'ai-business-implementation-outline.docx'
           }
         ]
       }
@@ -826,10 +1105,11 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your technical content.',
+            label: 'To simplify your technical content for social media, first upload your technical content.',
             type: 'file' as const,
             description: 'PDF, Word, or text file containing technical product information',
-            required: true
+            required: true,
+            demo_value: 'product-specs-v2.docx'
           },
           {
             label: 'Select target platform.',
@@ -841,7 +1121,8 @@ export const searchTasks = {
               'Facebook',
               'All platforms'
             ],
-            required: true
+            required: true,
+            demo_value: 'LinkedIn'
           },
           {
             label: 'Choose audience technical level.',
@@ -852,10 +1133,12 @@ export const searchTasks = {
               'Industry familiar',
               'Mixed audience'
             ],
-            required: true
+            required: true,
+            demo_value: 'Mixed audience'
           },
           {
-            label: 'The system will simplify your technical content into engaging social media posts while maintaining accuracy.'
+            label: 'The system will simplify your technical content into engaging social media posts while maintaining accuracy.',
+            demo_value: 'social-media-content-pack.zip'
           }
         ]
       }
@@ -875,7 +1158,8 @@ export const searchTasks = {
             label: 'Upload your webinar transcript.',
             type: 'file' as const,
             description: 'Text or Word document containing the webinar transcript',
-            required: true
+            required: true,
+            demo_value: 'ai-trends-webinar-transcript.docx'
           },
           {
             label: 'Select content format preferences.',
@@ -887,7 +1171,8 @@ export const searchTasks = {
               'Q&A style format',
               'Mixed content types'
             ],
-            required: true
+            required: true,
+            demo_value: 'Series of shorter posts'
           },
           {
             label: 'Choose content focus areas.',
@@ -899,16 +1184,19 @@ export const searchTasks = {
               'Expert insights',
               'Audience questions'
             ],
-            required: true
+            required: true,
+            demo_value: 'Practical applications'
           },
           {
             label: 'Add custom sections to include.',
             type: 'textarea' as const,
             placeholder: 'Enter specific topics or segments to highlight',
-            required: false
+            required: false,
+            demo_value: 'Industry trends 2024, Implementation strategies, Success metrics'
           },
           {
-            label: 'The system will transform your webinar transcript into structured blog content with proper formatting and engagement elements.'
+            label: 'The system will transform your webinar transcript into structured blog content with proper formatting and engagement elements.',
+            demo_value: 'ai-trends-blog-series.zip'
           }
         ]
       }
@@ -979,10 +1267,11 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your brand guidelines.',
+            label: 'To create a practical brand voice guide, first upload your brand guidelines.',
             type: 'file' as const,
             description: 'PDF or Word document containing brand guidelines',
-            required: true
+            required: true,
+            demo_value: 'brand-guidelines-2024.pdf'
           },
           {
             label: 'Select content types for examples.',
@@ -994,7 +1283,8 @@ export const searchTasks = {
               'Marketing materials',
               'All content types'
             ],
-            required: true
+            required: true,
+            demo_value: 'All content types'
           },
           {
             label: 'Choose brand voice attributes.',
@@ -1006,7 +1296,8 @@ export const searchTasks = {
               'Elegant & sophisticated',
               'Custom combination'
             ],
-            required: true
+            required: true,
+            demo_value: 'Professional & authoritative'
           },
           {
             label: 'Select industry-specific considerations.',
@@ -1018,16 +1309,19 @@ export const searchTasks = {
               'E-commerce',
               'Custom industry'
             ],
-            required: true
+            required: true,
+            demo_value: 'B2B technology'
           },
           {
             label: 'Add specific terms or phrases to include.',
             type: 'textarea' as const,
             placeholder: 'Enter brand-specific terminology or key phrases',
-            required: false
+            required: false,
+            demo_value: 'Innovation, Excellence, Customer-centric, Enterprise-grade'
           },
           {
-            label: 'The system will create a practical brand voice guide with real-world examples and writing templates for different contexts.'
+            label: 'The system will create a practical brand voice guide with real-world examples and writing templates for different contexts.',
+            demo_value: 'brand-voice-guide-2024.pdf'
           }
         ]
       }
@@ -1088,13 +1382,21 @@ export const searchTasks = {
       run_count: 172438,
       eval_rating: 4.7,
       cost: 2,
+      demo_output: {
+        type: 'media' as const,
+        output: '/release-notes-preview.png',
+        metadata: {
+          summary: 'Visual changelog with feature highlights and user impact'
+        }
+      },
       form: {
         fields: [
           {
-            label: 'Upload your technical documentation.',
+            label: 'To create clear release notes from your feature documentation, first upload your technical documentation.',
             type: 'file' as const,
             description: 'PDF, Word, or Markdown files containing feature documentation',
-            required: true
+            required: true,
+            demo_value: 'feature-docs-v2.1.md'
           },
           {
             label: 'Select release note format.',
@@ -1105,7 +1407,8 @@ export const searchTasks = {
               'Mixed audience format',
               'Marketing highlights'
             ],
-            required: true
+            required: true,
+            demo_value: 'Mixed audience format'
           },
           {
             label: 'Choose categorization method.',
@@ -1116,10 +1419,12 @@ export const searchTasks = {
               'By user role',
               'By product area'
             ],
-            required: true
+            required: true,
+            demo_value: 'By impact level'
           },
           {
-            label: 'The system will generate clear and organized release notes highlighting key changes and improvements.'
+            label: 'The system will generate clear and organized release notes highlighting key changes and improvements.',
+            demo_value: 'release-notes-v2.1.md'
           }
         ]
       }
@@ -1136,10 +1441,11 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your wireframe files.',
+            label: 'To generate user-friendly interface copy, first upload your wireframe files.',
             type: 'file' as const,
             description: 'PDF, PNG, or design tool export files',
-            required: true
+            required: true,
+            demo_value: 'dashboard-wireframes-v3.fig'
           },
           {
             label: 'Select interface elements to focus on.',
@@ -1151,7 +1457,8 @@ export const searchTasks = {
               'Navigation items',
               'All UI elements'
             ],
-            required: true
+            required: true,
+            demo_value: 'All UI elements'
           },
           {
             label: 'Choose tone of voice.',
@@ -1162,16 +1469,19 @@ export const searchTasks = {
               'Professional and formal',
               'Casual and conversational'
             ],
-            required: true
+            required: true,
+            demo_value: 'Friendly and helpful'
           },
           {
             label: 'Add brand-specific terms.',
             type: 'textarea' as const,
             placeholder: 'Enter product or feature names to use',
-            required: false
+            required: false,
+            demo_value: 'DataFlow Pro, SmartSync, QuickView Dashboard'
           },
           {
-            label: 'The system will generate user-friendly copy for all selected interface elements following your brand voice.'
+            label: 'The system will generate user-friendly copy for all selected interface elements following your brand voice.',
+            demo_value: 'ux-copy-suggestions.csv'
           }
         ]
       }
@@ -1188,10 +1498,11 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your error message log.',
+            label: 'To rewrite technical error messages with empathy and clarity, first upload your error message log.',
             type: 'file' as const,
             description: 'CSV, JSON, or text file containing error messages',
-            required: true
+            required: true,
+            demo_value: 'system-errors-march2024.json'
           },
           {
             label: 'Select error message style.',
@@ -1202,7 +1513,8 @@ export const searchTasks = {
               'Technical but accessible',
               'Casual and reassuring'
             ],
-            required: true
+            required: true,
+            demo_value: 'Friendly and helpful'
           },
           {
             label: 'Choose solution detail level.',
@@ -1213,10 +1525,12 @@ export const searchTasks = {
               'Technical details included',
               'Mixed (based on error type)'
             ],
-            required: true
+            required: true,
+            demo_value: 'Mixed (based on error type)'
           },
           {
-            label: 'The system will transform technical error messages into user-friendly communications with clear next steps.'
+            label: 'The system will transform technical error messages into user-friendly communications with clear next steps.',
+            demo_value: 'user-friendly-error-messages.csv'
           }
         ]
       }
@@ -1233,10 +1547,11 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your research transcripts.',
+            label: 'To extract key insights from your user research, first upload your research transcripts.',
             type: 'file' as const,
             description: 'Text or Word documents containing interview transcripts',
-            required: true
+            required: true,
+            demo_value: 'user-interviews-batch3.zip'
           },
           {
             label: 'Select research focus areas.',
@@ -1248,7 +1563,8 @@ export const searchTasks = {
               'User satisfaction',
               'All insights'
             ],
-            required: true
+            required: true,
+            demo_value: 'All insights'
           },
           {
             label: 'Choose analysis method.',
@@ -1260,7 +1576,8 @@ export const searchTasks = {
               'Sentiment analysis',
               'Comprehensive review'
             ],
-            required: true
+            required: true,
+            demo_value: 'Thematic analysis'
           },
           {
             label: 'Set participant grouping criteria.',
@@ -1272,16 +1589,19 @@ export const searchTasks = {
               'By feature usage',
               'Custom segments'
             ],
-            required: true
+            required: true,
+            demo_value: 'By user role'
           },
           {
             label: 'Add specific terms to track.',
             type: 'textarea' as const,
             placeholder: 'Enter keywords or phrases to monitor',
-            required: false
+            required: false,
+            demo_value: 'onboarding experience, dashboard usage, export functionality'
           },
           {
-            label: 'The system will analyze interview transcripts and generate a detailed insights report with actionable recommendations.'
+            label: 'The system will analyze interview transcripts and generate a detailed insights report with actionable recommendations.',
+            demo_value: 'user-research-insights-q1.pdf'
           }
         ]
       }
@@ -1298,7 +1618,7 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your user feedback data.',
+            label: 'To prioritize user feedback based on frequency and impact, first upload your user feedback data.',
             type: 'file' as const,
             description: 'CSV or Excel file containing user feedback',
             required: true
@@ -1357,7 +1677,7 @@ export const searchTasks = {
       form: {
         fields: [
           {
-            label: 'Upload your product requirements document.',
+            label: 'To create a concise summary of your product requirements, first upload your product requirements document.',
             type: 'file' as const,
             description: 'PDF or Word document containing detailed requirements',
             required: true

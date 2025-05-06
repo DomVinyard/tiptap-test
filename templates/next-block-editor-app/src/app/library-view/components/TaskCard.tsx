@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DM_Sans } from 'next/font/google';
 import { DM_Mono } from 'next/font/google';
-import { Star, Clock, Repeat } from 'lucide-react';
+import { Star, Clock, Repeat, Heart } from 'lucide-react';
 import { TaskItemType } from '../data/index';
 import { OrnateBorder } from './OrnatePatterns';
 
@@ -21,6 +21,7 @@ const dmMono = DM_Mono({
 export type TaskCardProps = Omit<TaskItemType, 'id'> & {
   id?: string; // Optional id for determining template/color
   runCount?: number; // Optional run count for metrics
+  disableHover?: boolean; // Optional prop to disable hover effects
 };
 
 // Vintage color palette
@@ -63,6 +64,14 @@ const getHashValue = (str: string, modulus: number): number => {
   return Math.abs(hash % modulus);
 };
 
+// Helper to format numbers consistently
+const formatNumber = (num: number): string => {
+  if (num >= 1000) {
+    return `${(num/1000).toFixed(1).replace(/\.0$/, '')}k`;
+  }
+  return num.toString();
+};
+
 export const TaskCard: React.FC<TaskCardProps> = ({
   id = 'default',
   title,
@@ -77,14 +86,29 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onClick,
   runCount,
   eval_rating,
+  disableHover = false,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Handle click based on whether it's a custom task
+  const handleClick = () => {
+    if (lastEdited) {
+      alert('Open in Studio');
+    } else {
+      onClick?.();
+    }
+  };
 
   // Template 1: Centered text with minimal decoration
   const renderCenteredTemplate = (bgColor: string) => (
     <div 
-      className="cursor-pointer will-change-transform"
-      onClick={onClick}
+      className={`will-change-transform ${!lastEdited ? 'cursor-pointer' : 'cursor-default'}`}
+      onClick={handleClick}
       style={{
         backgroundColor: bgColor,
         padding: '1.5rem',
@@ -94,15 +118,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        transition: 'transform 2000ms ease',
+        transition: isClient && !disableHover ? 'transform 300ms ease' : 'none',
+        transform: isClient && isHovered && !disableHover && !lastEdited ? 'scale(1.02)' : 'scale(1)',
       }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transition = 'transform 75ms ease';
-        e.currentTarget.style.transform = 'scale(1.05)';
+      onMouseEnter={() => {
+        if (isClient && !disableHover && !lastEdited) {
+          setIsHovered(true);
+        }
       }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transition = 'transform 2000ms ease';
-        e.currentTarget.style.transform = 'scale(1)';
+      onMouseLeave={() => {
+        if (isClient && !disableHover && !lastEdited) {
+          setIsHovered(false);
+        }
       }}
     >
       <div className="flex flex-col h-full items-center justify-between py-4">
@@ -115,7 +142,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             >
               <span className="flex items-center gap-1">
                 <Repeat className="w-3 h-3" stroke="#000" color="#000" strokeWidth={2} />
-                {runCount >= 1000 ? `${(runCount/1000).toFixed(runCount % 1000 === 0 ? 0 : 1)}k` : runCount.toLocaleString()}
+                {formatNumber(runCount)}
               </span>
             </span>
           </div>
@@ -171,22 +198,26 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   const renderOrnateTemplate = () => (
     <div 
       className="cursor-pointer p-4 will-change-transform"
-      onClick={onClick}
+      onClick={handleClick}
       style={{
         backgroundColor: color,
         borderRadius: '0px',
         boxShadow: 'none',
         height: `${CARD_HEIGHT}px`,
         display: 'flex',
-        transition: 'transform 1000ms ease',
+        transition: disableHover ? undefined : 'transform 300ms ease',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transition = 'transform 75ms ease';
-        e.currentTarget.style.transform = 'scale(1.05)';
+        if (!disableHover && !lastEdited) {
+          e.currentTarget.style.transition = 'transform 75ms ease';
+          e.currentTarget.style.transform = 'scale(1.02)';
+        }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.transition = 'transform 1000ms ease';
-        e.currentTarget.style.transform = 'scale(1)';
+        if (!disableHover && !lastEdited) {
+          e.currentTarget.style.transition = 'transform 300ms ease';
+          e.currentTarget.style.transform = 'scale(1)';
+        }
       }}
     >
       <div className="w-full h-full">
@@ -219,7 +250,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                 {typeof runCount === 'number' && (
                   <span className={`flex items-center gap-1 text-xs text-black select-none ${dmMono.className}`}>
                     <Repeat className="w-3 h-3" stroke="#000" color="#000" strokeWidth={2} />
-                    {runCount >= 1000 ? `${(runCount/1000).toFixed(runCount % 1000 === 0 ? 0 : 1)}k` : runCount.toLocaleString()}
+                    {formatNumber(runCount)}
                   </span>
                 )}
                 {typeof eval_rating === 'number' && (
@@ -261,7 +292,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     return (
       <div
         className="relative cursor-pointer will-change-transform"
-        onClick={onClick}
+        onClick={handleClick}
         style={{
           background: color,
           height: `${CARD_HEIGHT}px`,
@@ -270,15 +301,19 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          transition: 'transform 1000ms ease',
+          transition: disableHover ? undefined : 'transform 300ms ease',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.transition = 'transform 75ms ease';
-          e.currentTarget.style.transform = 'scale(1.05)';
+          if (!disableHover && !lastEdited) {
+            e.currentTarget.style.transition = 'transform 75ms ease';
+            e.currentTarget.style.transform = 'scale(1.02)';
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.transition = 'transform 1000ms ease';
-          e.currentTarget.style.transform = 'scale(1)';
+          if (!disableHover && !lastEdited) {
+            e.currentTarget.style.transition = 'transform 300ms ease';
+            e.currentTarget.style.transform = 'scale(1)';
+          }
         }}
       >
         {/* Borders and corners remain unchanged */}
@@ -345,7 +380,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               {typeof runCount === 'number' && (
                 <span className={`flex items-center gap-1 text-xs text-black select-none ${dmMono.className}`}>
                   <Repeat className="w-3 h-3" stroke="#000" color="#000" strokeWidth={2} />
-                  {runCount >= 1000 ? `${(runCount/1000).toFixed(runCount % 1000 === 0 ? 0 : 1)}k` : runCount.toLocaleString()}
+                  {formatNumber(runCount)}
                 </span>
               )}
               {typeof eval_rating === 'number' && (
@@ -364,26 +399,27 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   // Template 4: Description only, larger text
   const renderRightAlignedTemplate = () => (
     <div 
-      className="cursor-pointer relative will-change-transform"
-      onClick={onClick}
+      className="cursor-pointer p-4 will-change-transform"
+      onClick={handleClick}
       style={{
         backgroundColor: color,
-        padding: '1.5rem',
-        borderRadius: '2px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+        borderRadius: '0px',
+        boxShadow: 'none',
         height: `${CARD_HEIGHT}px`,
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        transition: 'transform 1000ms ease',
+        transition: disableHover ? undefined : 'transform 300ms ease',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transition = 'transform 75ms ease';
-        e.currentTarget.style.transform = 'scale(1.05)';
+        if (!disableHover && !lastEdited) {
+          e.currentTarget.style.transition = 'transform 75ms ease';
+          e.currentTarget.style.transform = 'scale(1.02)';
+        }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.transition = 'transform 1000ms ease';
-        e.currentTarget.style.transform = 'scale(1)';
+        if (!disableHover && !lastEdited) {
+          e.currentTarget.style.transition = 'transform 300ms ease';
+          e.currentTarget.style.transform = 'scale(1)';
+        }
       }}
     >
       <div className="flex flex-col h-full justify-between">
@@ -407,7 +443,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             {typeof runCount === 'number' && (
               <span className={`flex items-center gap-1 text-xs text-black select-none ${dmMono.className}`}>
                 <Repeat className="w-3 h-3" stroke="#000" color="#000" strokeWidth={2} />
-                {runCount >= 1000 ? `${(runCount/1000).toFixed(runCount % 1000 === 0 ? 0 : 1)}k` : runCount.toLocaleString()}
+                {formatNumber(runCount)}
               </span>
             )}
             {typeof eval_rating === 'number' && (
