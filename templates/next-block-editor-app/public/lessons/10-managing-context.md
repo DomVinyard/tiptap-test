@@ -130,4 +130,4 @@ Let's practice managing context:
 
 ## Next Steps
 
-In the next lesson, we'll explore If/Else & Loops – how to add logic and repetition to your flows. You'll learn to create dynamic, intelligent applications that can make decisions and repeat tasks as needed! 
+In the next lesson, we'll explore Conditions & Loops – how to add logic and repetition to your flows. You'll learn to create dynamic, intelligent applications that can make decisions and repeat tasks as needed! 
