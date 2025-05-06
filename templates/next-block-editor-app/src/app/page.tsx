@@ -12,12 +12,6 @@ const experiments = [
     date: '2025-05-05',
   },
   {
-    id: 'traceview-tests',
-    title: 'TraceView Tests',
-    description: 'Experimental interface for visualizing and analyzing trace data with interactive components.',
-    date: '2025-05-01',
-  },
-  {
     id: 'three-layers-abstraction',
     title: 'Three Layers of Abstraction',
     description: 'A dedicated environment for creating, managing, and interacting with AI agents, featuring a modern studio interface for agent development and testing.',
