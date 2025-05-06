@@ -493,14 +493,28 @@ function LibraryViewContent() {
               </button>
             </div>
 
+            {/* Only show panel if not hidden */}
             {!hiddenPanels['automations-info'] && (
-              <InfoPanel 
-                id="automations-info"
-                icon={Moon}
-                title="Work While You Rest"
-                description="Set up your tasks once, and let them work their magic automatically. Whether you're focused on other projects or taking a well-deserved break, your automated tasks will keep things moving smoothly."
-                onHide={() => handleHidePanel('automations-info')}
-              />
+              <div className="mb-20 bg-gradient-to-br from-[#1E293B] to-[#2D3B4F] rounded-2xl p-10 text-white flex items-start gap-8 shadow-lg border border-white/5 relative group">
+                <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-400/10 to-purple-400/10 flex items-center justify-center backdrop-blur-sm">
+                  <Moon className="w-8 h-8 text-indigo-200" />
+                </div>
+                <div className="py-1">
+                  <h3 className="text-xl font-medium mb-3 text-blue-50">Work While You Rest</h3>
+                  <p className="text-blue-100/80 leading-relaxed text-[15px]">
+                    Set up your tasks once, and let them work their magic automatically. Whether you're focused on other projects or taking a well-deserved break, your automated tasks will keep things moving smoothly.
+                  </p>
+                </div>
+                {isClient && (
+                  <button 
+                    onClick={() => handleHidePanel('automations-info')}
+                    className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Hide this panel"
+                  >
+                    <X className="w-4 h-4 text-white/70" />
+                  </button>
+                )}
+              </div>
             )}
 
             {/* Triggers Section */}
@@ -745,14 +759,28 @@ function LibraryViewContent() {
               </button>
             </div>
 
+            {/* Only show panel if not hidden */}
             {!hiddenPanels['tasks-info'] && (
-              <InfoPanel 
-                id="tasks-info"
-                icon={Moon}
-                title="Your Personal Task Collection"
-                description="Create and customize tasks that perfectly match your needs. From simple automations to complex workflows, your personal collection keeps everything organized and ready to use."
-                onHide={() => handleHidePanel('tasks-info')}
-              />
+              <div className="mb-20 bg-gradient-to-br from-[#1E293B] to-[#2D3B4F] rounded-2xl p-10 text-white flex items-start gap-8 shadow-lg border border-white/5 relative group">
+                <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-400/10 to-purple-400/10 flex items-center justify-center backdrop-blur-sm">
+                  <Moon className="w-8 h-8 text-indigo-200" />
+                </div>
+                <div className="py-1">
+                  <h3 className="text-xl font-medium mb-3 text-blue-50">Your Personal Task Collection</h3>
+                  <p className="text-blue-100/80 leading-relaxed text-[15px]">
+                    Create and customize tasks that perfectly match your needs. From simple automations to complex workflows, your personal collection keeps everything organized and ready to use.
+                  </p>
+                </div>
+                {isClient && (
+                  <button 
+                    onClick={() => handleHidePanel('tasks-info')}
+                    className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Hide this panel"
+                  >
+                    <X className="w-4 h-4 text-white/70" />
+                  </button>
+                )}
+              </div>
             )}
 
             {/* Custom Tasks Section */}
