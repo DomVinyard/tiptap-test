@@ -340,7 +340,7 @@ function LibraryViewContent() {
         return (
           <>
             {/* Wordware Header */}
-            <div className="flex justify-between items-center mb-8 px-2 pt-0 pb-2 pr-0">
+            <div className="flex justify-between items-center mb-8 px-1 pt-0 pb-2 pr-0">
               <div className="-ml-2 flex items-center gap-1">
                 <div className="flex items-center gap-1">
                   <span className={`${dmSerifDisplay.className} text-4xl`}>Tasks</span>
@@ -685,7 +685,9 @@ function LibraryViewContent() {
               <h1 className={`text-4xl ${dmSerifDisplay.className}`}>
                 Your Tasks
               </h1>
-              <button className="flex items-center bg-[#0F172A] hover:bg-black text-white rounded-md py-2 px-4 mt-2 text-sm">
+              <button onClick={() => {
+                alert('Open in Studio')
+              }} className="flex items-center bg-[#0F172A] hover:bg-black text-white rounded-md py-2 px-4 mt-2 text-sm">
                 <Plus className="w-4 h-4 mr-2" />
                 <span>New Task</span>
               </button>
