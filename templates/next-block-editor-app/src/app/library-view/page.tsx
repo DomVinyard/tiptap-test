@@ -407,8 +407,8 @@ function LibraryViewContent() {
                 />
               </div>
               <div className="flex items-center mt-[12px]">
-                <div className="flex items-center space-x-7 text-sm mr-8">
-                  <span className="text-slate-700 hover:text-slate-900 cursor-pointer">Pricing</span>
+                <div className="flex items-center space-x-8 text-base mr-8">
+  
                   <span 
                     className="text-slate-700 hover:text-slate-900 cursor-pointer"
                     onClick={() => {
@@ -416,8 +416,8 @@ function LibraryViewContent() {
                     }}
                   >Company & News</span>
                 </div>
-                <div className="flex items-center space-x-6">
-                  <span className="text-slate-700 text-sm hover:text-slate-900 cursor-pointer">Sign in</span>
+                <div className="flex items-center space-x-8">
+                  <span className="text-slate-700 text-base hover:text-slate-900 cursor-pointer">Sign in</span>
                   <button className="bg-[#0F172A] text-white px-4 py-2 rounded text-sm flex items-center">
                     Build Your Own <ArrowRight className="w-3 h-3 ml-1" />
                   </button>
