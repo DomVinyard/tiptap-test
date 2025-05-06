@@ -110,7 +110,7 @@ export default function CompanyNews() {
           <button 
             className="w-10 h-10 rounded-md flex items-center justify-center transition-colors text-gray-400 hover:text-white hover:bg-[#1e1e2e]"
             onClick={() => {
-              // Handle settings click
+              window.location.href = '/';
             }}
             title="Settings"
           >

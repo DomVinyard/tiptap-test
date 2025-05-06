@@ -1,7 +1,7 @@
 'use client'
 
 import { Surface } from '@/components/ui/Surface'
-import { ArrowRight, Clock, Heart, Plus, Search, Zap, FileText, Settings, Trash2, ChevronLeft, ChevronRight, Repeat, Star, CircleDollarSign } from 'lucide-react'
+import { ArrowRight, Clock, Heart, Plus, Search, Zap, FileText, Settings, Trash2, ChevronLeft, ChevronRight, Repeat, Star, CircleDollarSign, Moon, X } from 'lucide-react'
 import { DM_Serif_Display } from 'next/font/google'
 import Link from 'next/link'
 import { useState, useEffect, Suspense, useCallback } from 'react'
@@ -123,6 +123,38 @@ interface RunArtifact {
   isNew?: boolean;
 }
 
+// Add this after the color palette definitions
+const InfoPanel = ({ 
+  title, 
+  description, 
+  icon: Icon, 
+  id,
+  onHide 
+}: { 
+  title: string; 
+  description: string; 
+  icon: any;
+  id: string;
+  onHide: () => void;
+}) => (
+  <div className="mb-20 bg-gradient-to-br from-[#1E293B] to-[#2D3B4F] rounded-2xl p-10 text-white flex items-start gap-8 shadow-lg border border-white/5 relative group">
+    <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-400/10 to-purple-400/10 flex items-center justify-center backdrop-blur-sm">
+      <Icon className="w-8 h-8 text-indigo-200" />
+    </div>
+    <div className="py-1">
+      <h3 className="text-xl font-medium mb-3 text-blue-50">{title}</h3>
+      <p className="text-blue-100/80 leading-relaxed text-[15px]">{description}</p>
+    </div>
+    <button 
+      onClick={onHide}
+      className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+      title="Hide this panel"
+    >
+      <X className="w-4 h-4 text-white/70" />
+    </button>
+  </div>
+)
+
 export default function LibraryView() {
   const [activeSidebarItem, setActiveSidebarItem] = useState<'browse' | 'mytasks' | 'automations'>('browse');
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
@@ -167,6 +199,16 @@ function LibraryViewContent() {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [isNavigating, setIsNavigating] = useState(false)
   const [isClient, setIsClient] = useState(false)
+
+  // Simplified state for panel visibility - no localStorage
+  const [hiddenPanels, setHiddenPanels] = useState<{[key: string]: boolean}>({})
+
+  const handleHidePanel = (panelId: string) => {
+    setHiddenPanels(prev => ({
+      ...prev,
+      [panelId]: true
+    }))
+  }
 
   // Use useEffect to handle client-side initialization
   useEffect(() => {
@@ -451,6 +493,16 @@ function LibraryViewContent() {
               </button>
             </div>
 
+            {!hiddenPanels['automations-info'] && (
+              <InfoPanel 
+                id="automations-info"
+                icon={Moon}
+                title="Work While You Rest"
+                description="Set up your tasks once, and let them work their magic automatically. Whether you're focused on other projects or taking a well-deserved break, your automated tasks will keep things moving smoothly."
+                onHide={() => handleHidePanel('automations-info')}
+              />
+            )}
+
             {/* Triggers Section */}
             <div className="mb-12">
               <div className="flex items-center justify-between mb-3">
@@ -692,7 +744,17 @@ function LibraryViewContent() {
                 <span>New Task</span>
               </button>
             </div>
-            
+
+            {!hiddenPanels['tasks-info'] && (
+              <InfoPanel 
+                id="tasks-info"
+                icon={Moon}
+                title="Your Personal Task Collection"
+                description="Create and customize tasks that perfectly match your needs. From simple automations to complex workflows, your personal collection keeps everything organized and ready to use."
+                onHide={() => handleHidePanel('tasks-info')}
+              />
+            )}
+
             {/* Custom Tasks Section */}
             <div className="mb-16">
               <div className="flex items-center justify-between mb-3">
@@ -819,7 +881,7 @@ function LibraryViewContent() {
           <button 
             className="w-10 h-10 rounded-md flex items-center justify-center transition-colors text-gray-400 hover:text-white hover:bg-[#1e1e2e]"
             onClick={() => {
-              // Handle settings click
+              router.push('/');
             }}
             title="Settings"
           >
