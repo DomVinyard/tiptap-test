@@ -1016,7 +1016,7 @@ function LibraryViewContent() {
 
       {/* Main Content */}
       <div className={`flex-1 pt-6 pl-0 overflow-hidden bg-[#F8F5EB] ml-16 transition-all duration-300 ${isRightSidebarOpen ? 'pr-[384px]' : 'pr-[40px]'}`}>
-        <div className="max-w-5xl mx-auto pb-16">
+        <div className={`max-w-5xl mx-auto pb-16 ${activeSidebarItem !== 'browse' ? 'mb-48' : ''}`}>
           {renderMainContent()}
         </div>
       </div>
