@@ -97,6 +97,8 @@ export default function LibraryViewPage() {
     window.history.pushState({}, '', url)
     // Force a re-render to show the selected card
     window.dispatchEvent(new Event('popstate'))
+    // Scroll to top instantly
+    window.scrollTo(0, 0)
   }
 
   // Handle card detail close

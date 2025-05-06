@@ -106,7 +106,7 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
   return (
     <div>
       <div 
-        className="bg-white mb-8"
+        className="bg-white mb-8 mt-8"
         style={{
           border: `16px solid ${borderColor}`,
           borderRadius: '3px',
