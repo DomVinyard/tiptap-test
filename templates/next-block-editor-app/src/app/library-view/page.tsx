@@ -4,7 +4,7 @@ import { Surface } from '@/components/ui/Surface'
 import { ArrowRight, Clock, Plus, Search, Star, Zap } from 'lucide-react'
 import { DM_Serif_Display } from 'next/font/google'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { TaskCard } from './components/TaskCard'
 import { customTasks, sampleAutomations, searchTasks, pageSections, TaskItemType, getFavoriteItems, getAutomationsByCategory, getTaskById } from './data/index'
@@ -66,6 +66,17 @@ const gradientStyles = `
 `
 
 export default function LibraryViewPage() {
+  return (
+    <div className="min-h-screen bg-white dark:bg-slate-900 flex">
+      <style jsx global>{gradientStyles}</style>
+      <Suspense>
+        <LibraryViewContent />
+      </Suspense>
+    </div>
+  )
+}
+
+function LibraryViewContent() {
   const searchParams = useSearchParams()
   
   // Map URL params to sidebar items and get selected card
@@ -505,8 +516,7 @@ export default function LibraryViewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 flex">
-      <style jsx global>{gradientStyles}</style>
+    <>
       {/* Narrow Left Sidebar - Icons Only */}
       <div className="w-16 shrink-0 bg-[#121218] fixed left-0 top-0 bottom-0 flex flex-col items-center py-4 z-10">
         {/* Logo */}
@@ -599,6 +609,6 @@ export default function LibraryViewPage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }
