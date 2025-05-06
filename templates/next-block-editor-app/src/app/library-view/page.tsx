@@ -1,7 +1,7 @@
 'use client'
 
 import { Surface } from '@/components/ui/Surface'
-import { ArrowRight, Clock, Heart, Plus, Search, Zap, FileText, Settings, Trash2, ChevronLeft, ChevronRight, Repeat, Star, CircleDollarSign, Moon, X } from 'lucide-react'
+import { ArrowRight, Clock, Heart, Plus, Search, Zap, FileText, Settings, Trash2, ChevronLeft, ChevronRight, Repeat, Star, CircleDollarSign, X } from 'lucide-react'
 import { DM_Serif_Display } from 'next/font/google'
 import Link from 'next/link'
 import { useState, useEffect, Suspense, useCallback } from 'react'
@@ -11,6 +11,7 @@ import { customTasks, sampleAutomations, searchTasks, pageSections, TaskItemType
 import { CardDetail } from './components/CardDetail'
 import { AddAutomationModal } from './components/AddAutomationModal'
 import { RunArtifactSidebar } from './components/RunArtifactSidebar'
+import Image from 'next/image'
 
 // Vintage color palette - matching TaskCard.tsx
 const COLORS = {
@@ -499,10 +500,17 @@ function LibraryViewContent() {
             {/* Only show panel if not hidden */}
             {!hiddenPanels['automations-info'] && (
               <div className="mb-20 bg-gradient-to-br from-[#1E293B] to-[#2D3B4F] rounded-2xl p-10 text-white flex items-start gap-8 shadow-lg border border-white/5 relative group">
-                <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-400/10 to-purple-400/10 flex items-center justify-center backdrop-blur-sm">
-                  <Moon className="w-8 h-8 text-indigo-200" />
+                <div className="w-[120px] h-[100px] flex-shrink-0 flex items-center justify-center">
+                  <Image 
+                    src="/library/robot_2.svg" 
+                    alt="Sleepy Robot" 
+                    width={120} 
+                    height={100} 
+                    className="text-indigo-200"
+                    priority
+                  />
                 </div>
-                <div className="py-1">
+                <div className="py-1 flex-1">
                   <h3 className="text-xl font-medium mb-3 text-blue-50">Work While You Rest</h3>
                   <p className="text-blue-100/80 leading-relaxed text-[15px]">
                     Set up your tasks once, and let them work their magic automatically. Whether you're focused on other projects or taking a well-deserved break, your automated tasks will keep things moving smoothly.
@@ -765,11 +773,18 @@ function LibraryViewContent() {
             {/* Only show panel if not hidden */}
             {!hiddenPanels['tasks-info'] && (
               <div className="mb-20 bg-gradient-to-br from-[#1E293B] to-[#2D3B4F] rounded-2xl p-10 text-white flex items-start gap-8 shadow-lg border border-white/5 relative group">
-                <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-400/10 to-purple-400/10 flex items-center justify-center backdrop-blur-sm">
-                  <Moon className="w-8 h-8 text-indigo-200" />
+                <div className="w-[90px] h-[90px] flex-shrink-0 flex items-center justify-center">
+                  <Image 
+                    src="/library/robot_1.svg" 
+                    alt="Robot" 
+                    width={90} 
+                    height={90} 
+                    className="text-indigo-200"
+                    priority
+                  />
                 </div>
-                <div className="py-1">
-                  <h3 className="text-xl font-medium mb-3 text-blue-50">Your Personal Task Collection</h3>
+                <div className="py-1 flex-1">
+                  <h3 className="text-xl font-medium mb-3 text-blue-50">Your Personal AI Library</h3>
                   <p className="text-blue-100/80 leading-relaxed text-[15px]">
                     Create and customize tasks that perfectly match your needs. From simple automations to complex workflows, your personal collection keeps everything organized and ready to use.
                   </p>
