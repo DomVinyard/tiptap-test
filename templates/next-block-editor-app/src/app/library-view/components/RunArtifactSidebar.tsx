@@ -1,6 +1,8 @@
+'use client'
+
 import { Clock, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { RunArtifact } from './RunArtifact';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface RunArtifact {
   id: string;
@@ -33,6 +35,11 @@ const formatTimestamp = (timestamp: number) => {
 export function RunArtifactSidebar({ isOpen, runs, onClearRuns }: RunArtifactSidebarProps) {
   // Keep track of current index for each type
   const [currentIndices, setCurrentIndices] = useState<{ [type: string]: number }>({});
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Navigate through runs of a specific type
   const handleNavigation = (type: string, direction: 'prev' | 'next') => {
@@ -59,6 +66,10 @@ export function RunArtifactSidebar({ isOpen, runs, onClearRuns }: RunArtifactSid
       return latestB - latestA;
     })
     .map(([type]) => type);
+
+  if (!isClient) {
+    return null; // Or a loading state
+  }
 
   return (
     <div 
@@ -115,4 +126,4 @@ export function RunArtifactSidebar({ isOpen, runs, onClearRuns }: RunArtifactSid
       )}
     </div>
   );
-} 
+}

@@ -243,7 +243,10 @@ function LibraryViewContent() {
         if (!newRuns[newArtifact.type]) {
           newRuns[newArtifact.type] = [];
         }
+        
+        // Always add the new run at the beginning, regardless of taskId
         newRuns[newArtifact.type].unshift(newArtifact);
+        
         // Store updated runs in localStorage
         const allRuns = Object.values(newRuns).flat();
         localStorage.setItem('runArtifacts', JSON.stringify(allRuns));

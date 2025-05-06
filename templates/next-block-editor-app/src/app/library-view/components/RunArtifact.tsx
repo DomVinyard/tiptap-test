@@ -1,3 +1,5 @@
+'use client'
+
 import { Download, ExternalLink, Check, Calendar, Mail, Code, MessageSquare, FileSpreadsheet, Image as ImageIcon, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -53,8 +55,13 @@ export function RunArtifact({
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(isNew);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // Handle task title click
   const handleTitleClick = () => {
     const url = new URL(window.location.href);
@@ -89,6 +96,10 @@ export function RunArtifact({
     if (lines.length <= limit) return text;
     return lines.slice(0, limit).join('\n') + '\n...';
   };
+
+  if (!isClient) {
+    return null; // Or a loading state
+  }
 
   const renderContent = () => {
     if (isLoading) {

@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react';
 import { DM_Sans, DM_Serif_Display } from 'next/font/google';
 import { DM_Mono } from 'next/font/google';
@@ -110,7 +112,7 @@ interface RunArtifact {
 
 export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardClick }) => {
   const router = useRouter();
-  const [formValues, setFormValues] = useState<{ [key: string]: string }>({});
+  const [formValues, setFormValues] = useState<{ [key: number]: string }>({});
   const [isFavorited, setIsFavorited] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
@@ -120,23 +122,17 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
 
   // Clear form values when task changes
   useEffect(() => {
-    if (isClient) {
-      setFormValues({});
-    }
-  }, [task.id, isClient]);
+    setFormValues({});
+  }, [task.id]);
 
   // Handle favorite toggle
   const handleFavoriteToggle = () => {
-    if (isClient) {
-      setIsFavorited(!isFavorited);
-    }
+    setIsFavorited(!isFavorited);
   };
 
   // Handle edit click
   const handleEditClick = () => {
-    if (isClient) {
-      alert('Open in Studio');
-    }
+    alert('Open in Studio');
   };
 
   // Helper to check if form has values
@@ -165,6 +161,10 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
     url.searchParams.set('automation', `task-${task.id}`);
     router.push(url.search);
   };
+
+  if (!isClient) {
+    return null; // Or a loading state
+  }
 
   // Handle run task
   const handleRunTask = () => {
@@ -315,7 +315,7 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
         style={{
           border: `16px solid ${borderColor}`,
           borderRadius: '3px',
-          transition: isClient ? 'transform 500ms ease-out' : 'none'
+          transition: 'transform 500ms ease-out'
         }}
       >
         {/* Close button moved to match other icons */}

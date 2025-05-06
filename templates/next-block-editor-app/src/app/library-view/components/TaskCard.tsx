@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react';
 import { DM_Sans } from 'next/font/google';
 import { DM_Mono } from 'next/font/google';
@@ -94,6 +96,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Only render on client side
+  if (!isClient) {
+    return null; // Or a loading state
+  }
 
   // Handle click based on whether it's a custom task
   const handleClick = () => {
