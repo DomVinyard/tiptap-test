@@ -340,7 +340,7 @@ function LibraryViewContent() {
         return (
           <>
             {/* Wordware Header */}
-            <div className="flex justify-between items-center mb-8 px-2 pt-1 pb-2">
+            <div className="flex justify-between items-center mb-8 px-2 pt-0 pb-2 pr-0">
               <div className="-ml-2 flex items-center gap-1">
                 <div className="flex items-center gap-1">
                   <span className={`${dmSerifDisplay.className} text-4xl`}>Tasks</span>
@@ -364,7 +364,7 @@ function LibraryViewContent() {
                 </div>
                 <div className="flex items-center space-x-6">
                   <span className="text-slate-700 text-sm hover:text-slate-900 cursor-pointer">Sign in</span>
-                  <button className="bg-[#0F172A] text-white px-4 py-2 pl-2 rounded text-sm flex items-center">
+                  <button className="bg-[#0F172A] text-white px-4 py-2 rounded text-sm flex items-center">
                     Build Your Own <ArrowRight className="w-3 h-3 ml-1" />
                   </button>
                 </div>
@@ -372,8 +372,8 @@ function LibraryViewContent() {
             </div>
 
             {/* SaaS Splash Section */}
-            <div className="text-center mb-6 mt-24">
-              <h1 className={`text-7xl ${dmSerifDisplay.className} mb-0`}>
+            <div className="text-center mb-8 mt-28">
+              <h1 className={`text-6xl ${dmSerifDisplay.className} mb-0`}>
                 Make AI <span className="animated-gradient">work</span> for you
               </h1>
             </div>
@@ -438,13 +438,13 @@ function LibraryViewContent() {
         return (
           <>
             {/* Page Header - Automations */}
-            <div className="mb-16 mt-8 flex items-center justify-between">
-              <h1 className={`text-5xl ${dmSerifDisplay.className}`}>
+            <div className="mb-16 mt-1 flex items-center justify-between">
+              <h1 className={`text-4xl ${dmSerifDisplay.className}`}>
                 Automations
               </h1>
               <button 
                 onClick={handleNewAutomation}
-                className="flex items-center bg-[#0F172A] hover:bg-black text-white rounded-md py-2 px-4 mt-2"
+                className="flex items-center bg-[#0F172A] hover:bg-black text-white rounded-md py-2 px-4 mt-2 text-sm"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 <span>New Automation</span>
@@ -681,11 +681,11 @@ function LibraryViewContent() {
         return (
           <>
             {/* Page Header - My Tasks */}
-            <div className="mb-16 mt-8 flex items-center justify-between">
-              <h1 className={`text-5xl ${dmSerifDisplay.className}`}>
+            <div className="mb-16 mt-1 flex items-center justify-between">
+              <h1 className={`text-4xl ${dmSerifDisplay.className}`}>
                 Your Tasks
               </h1>
-              <button className="flex items-center bg-[#0F172A] hover:bg-black text-white rounded-md py-2 px-4 mt-2">
+              <button className="flex items-center bg-[#0F172A] hover:bg-black text-white rounded-md py-2 px-4 mt-2 text-sm">
                 <Plus className="w-4 h-4 mr-2" />
                 <span>New Task</span>
               </button>
@@ -762,14 +762,6 @@ function LibraryViewContent() {
     <>
       {/* Narrow Left Sidebar - Icons Only */}
       <div className="w-16 shrink-0 bg-[#121218] fixed left-0 top-0 bottom-0 flex flex-col items-center py-4 z-10">
-        {/* Logo */}
-        <Link 
-          href="/" 
-          className="mb-8 w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-md hover:shadow-lg transition-shadow"
-        >
-          W
-        </Link>
-        
         {/* Navigation Icons */}
         <div className="flex flex-col items-center space-y-6">
           <button 
@@ -813,7 +805,7 @@ function LibraryViewContent() {
         <div className="flex-1"></div>
 
         {/* Bottom Icons */}
-        <div className="flex flex-col items-center space-y-4 mb-4">
+        <div className="flex flex-col items-center space-y-4 py-4">
           <button 
             className="w-10 h-10 rounded-md flex items-center justify-center transition-colors text-gray-400 hover:text-white hover:bg-[#1e1e2e]"
             onClick={() => handleNavigation('/library-view/company', 'browse')}

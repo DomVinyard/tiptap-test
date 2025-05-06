@@ -59,14 +59,6 @@ export default function CompanyNews() {
     <div className="min-h-screen bg-[#0A0A0A] text-white flex">
       {/* Left Sidebar */}
       <div className="w-16 shrink-0 bg-[#121218] fixed left-0 top-0 bottom-0 flex flex-col items-center py-4 z-10">
-        {/* Logo */}
-        <Link 
-          href="/" 
-          className="mb-8 w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-md hover:shadow-lg transition-shadow"
-        >
-          W
-        </Link>
-        
         {/* Navigation Icons */}
         <div className="flex flex-col items-center space-y-6">
           <button 
@@ -104,7 +96,7 @@ export default function CompanyNews() {
         <div className="flex-1"></div>
 
         {/* Bottom Icons */}
-        <div className="flex flex-col items-center space-y-4 mb-4">
+        <div className="flex flex-col items-center space-y-4 py-4">
           <button 
             className="w-10 h-10 rounded-md flex items-center justify-center transition-colors bg-indigo-600 text-white"
             onClick={() => {
