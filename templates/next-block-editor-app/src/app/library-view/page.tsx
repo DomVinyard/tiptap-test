@@ -511,7 +511,7 @@ function LibraryViewContent() {
 
             {/* Only show tasks section if form is not submitted */}
             {!isFormSubmitted && (
-              <div className="mt-24">
+              <div className="mt-32">
                 {/* Content Sections */}
                 {pageSections.map(section => (
                   <div key={section.id} className="mb-16">
