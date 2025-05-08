@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { DM_Sans, DM_Serif_Display } from 'next/font/google';
 import { DM_Mono } from 'next/font/google';
-import { Star, Repeat, Play, Zap, Heart, Pencil, CircleDollarSign, FileText } from 'lucide-react';
+import { Star, Repeat, Play, Zap, Heart, ZoomIn, CircleDollarSign, FileText, Info } from 'lucide-react';
 import { X as XIcon } from 'lucide-react';
 import { TaskItemType } from '../data/index';
 import { TaskCard } from './TaskCard';
@@ -109,6 +109,19 @@ interface RunArtifact {
   };
   isNew?: boolean;
 }
+
+// Add Tooltip component before CardDetail component
+const Tooltip = ({ children, content }: { children: React.ReactNode; content: string }) => {
+  return (
+    <div className="relative group inline-block">
+      {children}
+      <div className="absolute z-10 invisible group-hover:visible bg-slate-800 text-white text-sm rounded-lg py-2 px-3 w-64 -right-2 top-full mt-1">
+        {content}
+        <div className="absolute -top-1 right-4 w-2 h-2 bg-slate-800 rotate-45"></div>
+      </div>
+    </div>
+  );
+};
 
 export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardClick }) => {
   const router = useRouter();
@@ -331,12 +344,6 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
             />
           </button>
           <button 
-            className="p-1.5 hover:bg-black/5 rounded-md transition-colors"
-            onClick={handleEditClick}
-          >
-            <Pencil className="w-5 h-5 text-black" strokeWidth={1.5} />
-          </button>
-          <button 
             onClick={() => {
               window.location.href = window.location.pathname;
             }}
@@ -401,44 +408,39 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
                         <h3 className={`text-xl font-bold ${dmSans.className}`}>
                           {field.label}
                           {field.required && <span className="text-red-500 ml-1">*</span>}
+                          {field.description && (
+                            <Tooltip content={field.description}>
+                              <Info className="w-4 h-4 text-slate-500 cursor-help ml-1 inline-block -mt-1" />
+                            </Tooltip>
+                          )}
                         </h3>
                       </div>
 
                       {/* Field Input */}
                       {field.type === 'file' && (
                         <>
-                          <div className="mt-3 flex justify-center rounded-lg border border-dashed border-slate-300 px-6 py-10 bg-slate-50">
+                          <div className="mt-3 flex justify-center w-full rounded-lg border border-dashed border-slate-300 px-6 py-8">
                             <div className="text-center">
-                              <div className="mt-1 flex text-sm leading-6 text-slate-600">
-                                {!formValues[index] && (
-                                  <>
-                                    <label
-                                      className="relative cursor-pointer rounded-md font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                                    >
-                                      <span>Upload a file</span>
-                                      <input 
-                                        type="file" 
-                                        className="sr-only" 
-                                        onChange={(e) => handleFieldChange(index, e.target.value)}
-                                      />
-                                    </label>
-                                    <p className="pl-1">or drag and drop</p>
-                                  </>
-                                )}
+                              <FileText className="mx-auto h-12 w-12 text-slate-300" />
+                              <div className="mt-4 flex text-sm leading-6 text-slate-600">
+                                <label
+                                  htmlFor="file-upload"
+                                  className="relative cursor-pointer rounded-md font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                                >
+                                  <span>Upload a file</span>
+                                  <input
+                                    id="file-upload"
+                                    name="file-upload"
+                                    type="file"
+                                    className="sr-only"
+                                    onChange={(e) => handleFieldChange(index, e.target.files?.[0]?.name || '')}
+                                  />
+                                </label>
+                                <p className="pl-1">or drag and drop</p>
                               </div>
-                              {formValues[index] && (
-                                <div className="flex items-center justify-center gap-3 text-slate-600">
-                                  <FileText className="w-6 h-6" strokeWidth={1.5} />
-                                  <p className="text-base">{formValues[index]}</p>
-                                </div>
-                              )}
+                              <p className="text-xs leading-5 text-slate-500">PDF, DOC, TXT up to 10MB</p>
                             </div>
                           </div>
-                          {field.description && (
-                            <p className={`text-sm text-slate-500 mt-2 ${dmSans.className}`}>
-                              {field.description}
-                            </p>
-                          )}
                         </>
                       )}
 
@@ -461,46 +463,27 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
                               </svg>
                             </div>
                           </div>
-                          {field.description && (
-                            <p className={`text-sm text-slate-500 mt-2 ${dmSans.className}`}>
-                              {field.description}
-                            </p>
-                          )}
                         </>
                       )}
 
                       {field.type === 'text' && (
-                        <>
-                          <input
-                            type="text"
-                            placeholder={field.placeholder}
-                            value={formValues[index] || ''}
-                            onChange={(e) => handleFieldChange(index, e.target.value)}
-                            className="mt-3 block w-full rounded-md border-0 px-4 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                          />
-                          {field.description && (
-                            <p className={`text-sm text-slate-500 mt-2 ${dmSans.className}`}>
-                              {field.description}
-                            </p>
-                          )}
-                        </>
+                        <input
+                          type="text"
+                          placeholder={field.placeholder}
+                          value={formValues[index] || ''}
+                          onChange={(e) => handleFieldChange(index, e.target.value)}
+                          className="mt-3 block w-full rounded-md border-0 px-4 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
                       )}
 
                       {field.type === 'textarea' && (
-                        <>
-                          <textarea
-                            rows={4}
-                            placeholder={field.placeholder}
-                            value={formValues[index] || ''}
-                            onChange={(e) => handleFieldChange(index, e.target.value)}
-                            className="mt-3 block w-full rounded-md border-0 px-4 py-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-base leading-6"
-                          />
-                          {field.description && (
-                            <p className={`text-sm text-slate-500 mt-2 ${dmSans.className}`}>
-                              {field.description}
-                            </p>
-                          )}
-                        </>
+                        <textarea
+                          rows={4}
+                          placeholder={field.placeholder}
+                          value={formValues[index] || ''}
+                          onChange={(e) => handleFieldChange(index, e.target.value)}
+                          className="mt-3 block w-full rounded-md border-0 px-4 py-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-base leading-6"
+                        />
                       )}
                     </>
                   ) : (
@@ -516,23 +499,35 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
 
         {/* Footer Section */}
         <div style={{ backgroundColor: borderColor }}>
-          <div className="px-0 pt-3 pb-0 flex justify-end items-center gap-5">
-            <button 
-              className="text-black hover:text-black/80 rounded-md flex items-center gap-2 transition-colors mr-4"
-              onClick={handleAutomateClick}
-            >
-              <Zap className="w-4 h-4" fill="currentColor" />
-              <span className="font-medium">Automate Task</span>
-            </button>
-            
-            <div className="pr-0">
+          <div className="px-0 pt-3 pb-0 flex justify-between items-center">
+            <div className="flex items-center gap-5">
               <button 
-                className="bg-black text-white px-5 py-2.5 rounded-md flex items-center gap-2 hover:bg-slate-800 transition-colors"
-                onClick={handleRunTask}
+                className="text-black hover:text-black/80 rounded-md flex items-center gap-2 transition-colors ml-4"
+                onClick={handleEditClick}
               >
-                <Play className="w-4 h-4" fill="currentColor" />
-                <span className="font-medium">Run Task</span>
+                <ZoomIn className="w-4 h-4" />
+                <span className="font-medium">Zoom In</span>
               </button>
+            </div>
+            
+            <div className="flex items-center gap-5">
+              <button 
+                className="text-black hover:text-black/80 rounded-md flex items-center gap-2 transition-colors"
+                onClick={handleAutomateClick}
+              >
+                <Zap className="w-4 h-4" fill="currentColor" />
+                <span className="font-medium">Automate Task</span>
+              </button>
+              
+              <div className="pr-4">
+                <button 
+                  className="bg-black text-white px-5 py-2.5 rounded-md flex items-center gap-2 hover:bg-slate-800 transition-colors"
+                  onClick={handleRunTask}
+                >
+                  <Play className="w-4 h-4" fill="currentColor" />
+                  <span className="font-medium">Run Task</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
