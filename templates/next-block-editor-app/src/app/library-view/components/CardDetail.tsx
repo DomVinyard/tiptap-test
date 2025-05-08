@@ -394,12 +394,12 @@ export const CardDetail: React.FC<CardDetailProps> = ({ task, onClose, onCardCli
         </div>
 
         {/* Main content container with consistent max-width */}
-        <div className="max-w-4xl mx-auto pt-12 pb-12">
+        <div className="max-w-4xl mx-auto pt-12 pb-8">
           {/* Form Fields */}
           {task.form?.fields && (
-            <div className="space-y-3.5">
+            <div className="space-y-2.5">
               {task.form.fields.map((field, index) => (
-                <div key={index} className="pb-4">
+                <div key={index} className="pb-3">
                   {/* Only show field if it has an input type or description */}
                   {(field.type || field.description) ? (
                     <>
