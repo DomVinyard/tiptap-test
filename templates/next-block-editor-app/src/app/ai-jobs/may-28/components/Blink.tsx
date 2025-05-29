@@ -1,113 +1,112 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-
-enum BackgroundState {
-  Standard = 'standard',
-  Side = 'side',
-  Blink = 'blink',
-}
+import { useState, useEffect, useMemo, useRef } from 'react'
 
 export function Blink() {
-  const [bgState, setBgState] = useState<BackgroundState>(BackgroundState.Standard)
-  const [blinkCount, setBlinkCount] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(false)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isBlinking, setIsBlinking] = useState(false)
+  const eyesRef = useRef<HTMLImageElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  // Cache image URLs to prevent triggering file system events
+  // Cache image URLs
   const imageUrls = useMemo(
     () => ({
-      standard: '/ai-jobs/library/robot_std.png',
-      side: '/ai-jobs/library/robot_side.png',
-      blink: '/ai-jobs/library/robot_blink.png',
+      robotBg: '/ai-jobs/library/robot_bg.png',
+      robotEyes: '/ai-jobs/library/robot_eyes.png',
+      robotEyesBlink: '/ai-jobs/library/robot_eyes_blink.png',
       logo: '/ai-jobs/library/ww_logo.png',
       login: '/ai-jobs/library/login_google.png',
     }),
     [],
   )
 
-  // Preload images for smoother transitions
+  // Track mouse position for eye movement
   useEffect(() => {
-    Object.values(imageUrls).forEach(url => {
-      const img = new Image()
-      img.src = url
-    })
-  }, [imageUrls])
+    const handleMouseMove = (e: MouseEvent) => {
+      if (containerRef.current && eyesRef.current) {
+        // Get container dimensions and position
+        const containerRect = containerRef.current.getBoundingClientRect()
 
-  // Handle the double-blink sequence
-  const handleBlinkSequence = () => {
-    setIsAnimating(true)
+        // Calculate custom center point - robot is positioned more to the right
+        // Approximately 25% from the left edge of the screen
+        const centerX = containerRect.left + containerRect.width * 0.25
+        const centerY = containerRect.top + containerRect.height * 0.5
 
-    // First blink
-    setBgState(BackgroundState.Blink)
-    setBlinkCount(1)
+        // Calculate the distance from center with increased sensitivity
+        // Using a smaller divisor increases sensitivity
+        const distanceX = (e.clientX - centerX) / (containerRect.width / 3)
+        const distanceY = (e.clientY - centerY) / (containerRect.height / 3)
 
-    setTimeout(() => {
-      setBgState(BackgroundState.Standard)
+        // Limit movement range (eyes can't move too far)
+        const maxMovement = 50 // pixels - reduced from 100 for more natural movement
+        const moveX = Math.min(Math.max(distanceX * maxMovement, -maxMovement), maxMovement)
+        const moveY = Math.min(Math.max(distanceY * maxMovement, -maxMovement), maxMovement)
 
-      setTimeout(() => {
-        // Second blink
-        setBgState(BackgroundState.Blink)
-        setBlinkCount(2)
-
-        setTimeout(() => {
-          setBgState(BackgroundState.Standard)
-          setBlinkCount(0)
-          setIsAnimating(false)
-        }, 150)
-      }, 200)
-    }, 150)
-  }
-
-  // Handle side view animation
-  const handleSideView = () => {
-    setIsAnimating(true)
-
-    setBgState(BackgroundState.Side)
-
-    setTimeout(
-      () => {
-        setBgState(BackgroundState.Standard)
-        setIsAnimating(false)
-      },
-      800 + Math.random() * 800,
-    )
-  }
-
-  // where to login with email
-  // gmail and text to voice
-
-  // Set up interval for random animations
-  useEffect(() => {
-    const triggerRandomAnimation = () => {
-      if (isAnimating) return
-
-      const choice = Math.random() > 0.5 ? 'side' : 'blink'
-
-      if (choice === 'side') {
-        handleSideView()
-      } else {
-        handleBlinkSequence()
+        // Update mouse position state
+        setMousePosition({ x: moveX, y: moveY })
       }
     }
 
-    const intervalId = setInterval(() => {
-      if (!isAnimating) {
-        if (Math.random() < 0.1) {
-          triggerRandomAnimation()
-        }
-      }
-    }, 1000)
+    // Add event listener
+    window.addEventListener('mousemove', handleMouseMove)
 
-    // Force an initial animation after 2 seconds
-    const initialTimeout = setTimeout(() => {
-      triggerRandomAnimation()
+    // Clean up
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [])
+
+  // Add blinking effect (unrelated to cursor movement)
+  useEffect(() => {
+    const doBlink = () => {
+      if (isBlinking) return // Don't start a new blink if already blinking
+
+      // Randomly choose between single and double blink
+      const isDoubleBlink = Math.random() > 0.4 // 60% double blinks, 40% single blinks
+
+      // Start blink sequence
+      setIsBlinking(true)
+
+      // First blink
+      setTimeout(() => {
+        // End first blink
+        setIsBlinking(false)
+
+        if (isDoubleBlink) {
+          // If double blink, add second blink after a small gap
+          setTimeout(() => {
+            // Second blink
+            setIsBlinking(true)
+
+            // End second blink
+            setTimeout(() => {
+              setIsBlinking(false)
+            }, 150)
+          }, 200)
+        }
+      }, 150)
+    }
+
+    // Set up random blinking interval
+    const intervalId = setInterval(() => {
+      // Random chance to blink (less frequent)
+      if (Math.random() < 0.05) {
+        // 5% chance each interval (reduced from 15%)
+        doBlink()
+      }
+    }, 3000) // Check every 3 seconds (increased from 1 second)
+
+    // Do an initial blink after 2 seconds
+    const initialBlinkTimeout = setTimeout(() => {
+      doBlink()
     }, 2000)
 
+    // Clean up
     return () => {
       clearInterval(intervalId)
-      clearTimeout(initialTimeout)
+      clearTimeout(initialBlinkTimeout)
     }
-  }, [isAnimating])
+  }, [isBlinking])
 
   // Handle Google login click
   const handleLoginClick = () => {
@@ -117,31 +116,34 @@ export function Blink() {
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden">
-      {/* All background images - only one is visible at a time */}
-      <div className="absolute inset-0 w-full h-full">
-        {/* Standard image */}
-        <img
-          src={imageUrls.standard}
-          alt="Robot standard pose"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ display: bgState === BackgroundState.Standard ? 'block' : 'none' }}
-        />
+      {/* Robot with eyes that follow cursor */}
+      <div ref={containerRef} className="absolute inset-0 w-full h-full">
+        {/* Background robot image */}
+        <img src={imageUrls.robotBg} alt="Robot" className="absolute inset-0 w-full h-full object-cover" />
 
-        {/* Side image */}
-        <img
-          src={imageUrls.side}
-          alt="Robot side pose"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ display: bgState === BackgroundState.Side ? 'block' : 'none' }}
-        />
-
-        {/* Blink image */}
-        <img
-          src={imageUrls.blink}
-          alt="Robot blinking pose"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ display: bgState === BackgroundState.Blink ? 'block' : 'none' }}
-        />
+        {/* Eyes layer - alternates between normal and blinking */}
+        {isBlinking ? (
+          <img
+            src={imageUrls.robotEyesBlink}
+            alt="Robot Eyes Blinking"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-75"
+            style={{
+              transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
+              pointerEvents: 'none',
+            }}
+          />
+        ) : (
+          <img
+            ref={eyesRef}
+            src={imageUrls.robotEyes}
+            alt="Robot Eyes"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-75"
+            style={{
+              transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
+              pointerEvents: 'none', // Make sure eyes don't block mouse events
+            }}
+          />
+        )}
       </div>
 
       {/* Logo in top left */}
