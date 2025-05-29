@@ -3,7 +3,10 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 
 export function Blink() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  // Target position (where eyes should eventually move to)
+  const [targetPosition, setTargetPosition] = useState({ x: 0, y: 0 })
+  // Current position (where eyes are currently at with inertia)
+  const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 })
   const [isBlinking, setIsBlinking] = useState(false)
   const eyesRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -42,8 +45,8 @@ export function Blink() {
         const moveX = Math.min(Math.max(distanceX * maxMovement, -maxMovement), maxMovement)
         const moveY = Math.min(Math.max(distanceY * maxMovement, -maxMovement), maxMovement)
 
-        // Update mouse position state
-        setMousePosition({ x: moveX, y: moveY })
+        // Update target position state (this is where eyes should eventually move to)
+        setTargetPosition({ x: moveX, y: moveY })
       }
     }
 
@@ -55,6 +58,45 @@ export function Blink() {
       window.removeEventListener('mousemove', handleMouseMove)
     }
   }, [])
+
+  // Smooth movement with inertia
+  useEffect(() => {
+    // If blinking, don't update position
+    if (isBlinking) return
+
+    // Animation frame for smooth movement
+    let animationFrameId: number
+
+    // Function to gradually move current position toward target position
+    const smoothlyUpdatePosition = () => {
+      setCurrentPosition(current => {
+        // Calculate distance between current and target positions
+        const dx = targetPosition.x - current.x
+        const dy = targetPosition.y - current.y
+
+        // Smoothing factor (lower = more inertia, higher = more responsive)
+        // 0.1 means the eyes move 10% of the remaining distance each frame
+        const smoothing = 0.08
+
+        // Update position with smoothing (lerp - linear interpolation)
+        return {
+          x: current.x + dx * smoothing,
+          y: current.y + dy * smoothing,
+        }
+      })
+
+      // Continue animation loop
+      animationFrameId = requestAnimationFrame(smoothlyUpdatePosition)
+    }
+
+    // Start animation loop
+    animationFrameId = requestAnimationFrame(smoothlyUpdatePosition)
+
+    // Clean up animation frame on unmount
+    return () => {
+      cancelAnimationFrame(animationFrameId)
+    }
+  }, [targetPosition, isBlinking])
 
   // Add blinking effect (unrelated to cursor movement)
   useEffect(() => {
@@ -126,9 +168,9 @@ export function Blink() {
           <img
             src={imageUrls.robotEyesBlink}
             alt="Robot Eyes Blinking"
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-75"
+            className="absolute inset-0 w-full h-full object-cover"
             style={{
-              transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
+              transform: `translate(${currentPosition.x}px, ${currentPosition.y}px)`,
               pointerEvents: 'none',
             }}
           />
@@ -137,9 +179,9 @@ export function Blink() {
             ref={eyesRef}
             src={imageUrls.robotEyes}
             alt="Robot Eyes"
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-75"
+            className="absolute inset-0 w-full h-full object-cover"
             style={{
-              transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
+              transform: `translate(${currentPosition.x}px, ${currentPosition.y}px)`,
               pointerEvents: 'none', // Make sure eyes don't block mouse events
             }}
           />
