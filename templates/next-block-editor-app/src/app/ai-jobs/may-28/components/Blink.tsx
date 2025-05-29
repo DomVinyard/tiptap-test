@@ -69,9 +69,12 @@ export function Blink() {
         setBgState(BackgroundState.Standard)
         setIsAnimating(false)
       },
-      800 + Math.random() * 400,
+      800 + Math.random() * 800,
     )
   }
+
+  // where to login with email
+  // gmail and text to voice
 
   // Set up interval for random animations
   useEffect(() => {
@@ -108,7 +111,8 @@ export function Blink() {
 
   // Handle Google login click
   const handleLoginClick = () => {
-    window.location.href = '/'
+    // Navigate to the quiz page using client-side navigation
+    window.location.href = '/ai-jobs/may-28/quiz'
   }
 
   return (
