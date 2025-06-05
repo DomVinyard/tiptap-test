@@ -17,6 +17,7 @@ import {
   Trash,
   Clock,
   Expand,
+  Edit3,
 } from 'lucide-react'
 import Image from 'next/image'
 
@@ -44,6 +45,8 @@ interface NotificationCardProps {
     label: string
     variant?: 'primary' | 'secondary'
     onClick: () => void
+    customStyle?: string
+    icon?: React.ReactNode
   }>
   notificationType?: 'approve' | 'select' | 'input' | 'edit'
   placeholder?: string
@@ -110,9 +113,12 @@ const NotificationCard = ({
       }
       // Default to 'text' type or if type is unspecified
       return (
-        <span className="text-neutral-700 dark:text-neutral-300 font-mono text-xs whitespace-pre-wrap">
+        <p
+          className="text-neutral-800 dark:text-neutral-200 text-base leading-relaxed"
+          style={{ fontFamily: 'PT Sans, sans-serif' }}
+        >
           {content.replace(/\\n/g, '\n')}
-        </span>
+        </p>
       )
     }
     return null
@@ -137,8 +143,17 @@ const NotificationCard = ({
 
               {/* Display structured preview if available */}
               {showPreviewBlock && (
-                <div className="mt-4 bg-white/70 dark:bg-white/15 rounded-lg relative overflow-hidden">
-                  <div className={`p-4 ${isLongPreview && notificationType !== 'edit' ? 'pb-12' : ''}`}>
+                <div
+                  className={`mt-4 bg-white/70 dark:bg-white/15 rounded-2xl relative ${notificationType === 'edit' ? 'overflow-hidden' : 'overflow-visible'}`}
+                >
+                  {/* Speech bubble triangle pointing right */}
+                  <div
+                    className="absolute top-6 -right-2 w-4 h-4 bg-white/70 dark:bg-white/15 rotate-45 transform z-10"
+                    style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}
+                  ></div>
+                  <div
+                    className={`p-4 ${isLongPreview && notificationType !== 'edit' ? 'pb-12' : ''} ${notificationType === 'edit' ? 'max-h-32 overflow-hidden' : ''}`}
+                  >
                     {displayedPreviewContent}
                     {/* Fade-out effect for edit notifications when content is long */}
                     {isLongPreview && notificationType === 'edit' && (
@@ -149,7 +164,7 @@ const NotificationCard = ({
                   {isLongPreview && notificationType !== 'edit' && (
                     <button
                       onClick={() => onOpenModal?.({ status, preview })}
-                      className="absolute bottom-0 left-0 right-0 bg-black/10 dark:bg-black/20 hover:bg-black/15 dark:hover:bg-black/25 transition-all duration-200 py-2 flex items-center justify-center gap-1.5"
+                      className="absolute bottom-0 left-0 right-0 bg-black/5 dark:bg-black/20 hover:bg-black/15 dark:hover:bg-black/25 transition-all duration-200 py-2 flex items-center justify-center gap-1.5 rounded-b-2xl"
                       title="View full content"
                     >
                       <Expand className="w-3 h-3" />
@@ -166,7 +181,7 @@ const NotificationCard = ({
                     value={inputValue}
                     onChange={e => setInputValue(e.target.value)}
                     placeholder={placeholder || 'Enter your response...'}
-                    className="w-full p-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 resize-none"
+                    className="w-full p-2 text-sm border border-black dark:border-neutral-600 rounded bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 resize-none"
                     rows={3}
                   />
                 </div>
@@ -175,21 +190,48 @@ const NotificationCard = ({
           </div>
           {((actions && actions.length > 0) || onDismiss) && (
             <div className="flex flex-col gap-2 mt-3">
-              {actions &&
+              {actions && notificationType === 'approve' ? (
+                // Side by side layout for approve buttons
+                <div className="flex gap-2 w-full">
+                  {actions.map((action, index) => (
+                    <Button
+                      key={index}
+                      buttonSize="medium"
+                      onClick={action.onClick}
+                      className={
+                        action.customStyle
+                          ? `flex-1 ${action.customStyle} border border-transparent rounded-md flex items-center justify-center gap-2`
+                          : 'flex-1 bg-black text-white hover:bg-neutral-800 dark:bg-black dark:hover:bg-neutral-700 border border-transparent rounded-md'
+                      }
+                    >
+                      {action.icon && action.icon}
+                      {action.label}
+                    </Button>
+                  ))}
+                </div>
+              ) : (
+                // Stacked layout for other notification types
+                actions &&
                 actions.map((action, index) => (
                   <Button
                     key={index}
                     buttonSize="medium"
                     onClick={action.onClick}
-                    className="w-full bg-black text-white hover:bg-neutral-800 dark:bg-black dark:hover:bg-neutral-700 border border-transparent rounded-md"
+                    className={
+                      action.customStyle
+                        ? `w-full ${action.customStyle} border border-transparent rounded-md flex items-center ${notificationType === 'select' ? 'justify-start pl-4' : 'justify-center'} gap-2`
+                        : 'w-full bg-black text-white hover:bg-neutral-800 dark:bg-black dark:hover:bg-neutral-700 border border-transparent rounded-md'
+                    }
                   >
+                    {action.icon && action.icon}
                     {action.label}
                   </Button>
-                ))}
+                ))
+              )}
 
               {/* Wrapper for Ignore, Snooze, and Discuss buttons in a single row */}
               {onDismiss && (
-                <div className="flex gap-2 w-full">
+                <div className="flex gap-2 w-full mt-2">
                   <Button
                     buttonSize="medium"
                     onClick={() => onDismiss(id)}
@@ -718,7 +760,7 @@ export default LoginButton;`,
     options: [
       'Michael Smith (Sales Lead, Acme Corp)',
       'Michael Smith (Support Agent, NY Branch)',
-      'Michael Smith (New Customer, Order #12345)',
+      'M Smith (New Customer, Order #12345)',
       'None of the above - needs manual search',
     ],
   },
@@ -1114,20 +1156,44 @@ function getActionsForNotification(notification: CustomNotification, onAction: (
   switch (notification.notificationType) {
     case 'approve':
       return [
-        { label: 'Approve', variant: 'primary' as const, onClick: () => onAction(notification.id, 'approved') },
-        { label: 'Deny', variant: 'secondary' as const, onClick: () => onAction(notification.id, 'declined') },
+        {
+          label: 'Reject',
+          variant: 'secondary' as const,
+          onClick: () => onAction(notification.id, 'declined'),
+          customStyle: 'bg-red-600 hover:bg-red-700 text-white',
+          icon: <XCircle className="w-4 h-4" />,
+        },
+        {
+          label: 'Approve',
+          variant: 'primary' as const,
+          onClick: () => onAction(notification.id, 'approved'),
+          customStyle: 'bg-green-600 hover:bg-green-700 text-white',
+          icon: <CheckCircle className="w-4 h-4" />,
+        },
       ]
     case 'select':
       return (
-        notification.options?.map(option => ({
+        notification.options?.map((option, index) => ({
           label: option,
           variant: 'secondary' as const,
           onClick: () => onAction(notification.id, `selected: ${option}`),
+          customStyle: 'bg-green-600 hover:bg-green-700 text-white',
+          icon: (
+            <span className="w-5 h-5 bg-white text-green-600 rounded-full flex items-center justify-center text-xs font-bold">
+              {index + 1}
+            </span>
+          ),
         })) || []
       )
     case 'input':
       return [
-        { label: 'Submit', variant: 'primary' as const, onClick: () => onAction(notification.id, 'input submitted') },
+        {
+          label: 'Submit',
+          variant: 'primary' as const,
+          onClick: () => onAction(notification.id, 'input submitted'),
+          customStyle: 'bg-green-600 hover:bg-green-700 text-white -mt-2',
+          icon: <CheckCircle className="w-4 h-4" />,
+        },
       ]
     case 'edit':
       return [
@@ -1135,6 +1201,8 @@ function getActionsForNotification(notification: CustomNotification, onAction: (
           label: 'Review & Submit',
           variant: 'primary' as const,
           onClick: () => alert('Open in full window to edit and submit'),
+          customStyle: 'bg-green-600 hover:bg-green-700 text-white',
+          icon: <Edit3 className="w-4 h-4" />,
         },
       ]
     default:
