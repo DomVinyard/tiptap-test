@@ -6,6 +6,13 @@ import { formatDistanceToNow } from 'date-fns'
 
 const experiments = [
   {
+    id: 'notification-cards',
+    title: 'Notification Cards',
+    description:
+      'Interactive notification card system with various states, animations, and user actions for modern web applications.',
+    date: '2025-06-04',
+  },
+  {
     id: 'ai-jobs/may-28',
     title: 'AI Jobs - Blinking Robot',
     description:
