@@ -92,7 +92,7 @@ const NotificationCard = ({
       // For long previews, show truncated content in the card
       if (isLongPreview && !isFullContent) {
         const lines = content.split('\n')
-        content = lines.slice(0, 3).join('\n') + (lines.length > 3 ? '\n...' : '')
+        content = lines.slice(0, 3).join('\n')
       }
 
       if (preview.type === 'code') {
@@ -119,8 +119,8 @@ const NotificationCard = ({
   }
 
   const displayedPreviewContent = renderPreviewContent(false)
-  // Determine if we should show a preview block (excluding for 'edit' type, which uses textarea)
-  const showPreviewBlock = notificationType !== 'edit' && displayedPreviewContent
+  // Determine if we should show a preview block (now including edit type)
+  const showPreviewBlock = displayedPreviewContent
 
   return (
     <div
@@ -135,38 +135,39 @@ const NotificationCard = ({
               <h3 className="font-semibold text-sm text-neutral-900 dark:text-neutral-100">{status}</h3>
               {requirement && <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">{requirement}</p>}
 
-              {/* Display structured preview if available and not in edit mode */}
+              {/* Display structured preview if available */}
               {showPreviewBlock && (
-                <div className="mt-4 p-4 bg-white/70 dark:bg-white/15 rounded-lg">
-                  {displayedPreviewContent}
-                  {isLongPreview && (
+                <div className="mt-4 bg-white/70 dark:bg-white/15 rounded-lg relative overflow-hidden">
+                  <div className={`p-4 ${isLongPreview && notificationType !== 'edit' ? 'pb-12' : ''}`}>
+                    {displayedPreviewContent}
+                    {/* Fade-out effect for edit notifications when content is long */}
+                    {isLongPreview && notificationType === 'edit' && (
+                      <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/70 to-transparent dark:from-white/15 dark:to-transparent pointer-events-none" />
+                    )}
+                  </div>
+                  {/* Expand button for non-edit notifications */}
+                  {isLongPreview && notificationType !== 'edit' && (
                     <button
                       onClick={() => onOpenModal?.({ status, preview })}
-                      className="mt-2 px-3 py-1.5 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-md transition-all duration-200 flex items-center gap-1.5"
+                      className="absolute bottom-0 left-0 right-0 bg-black/10 dark:bg-black/20 hover:bg-black/15 dark:hover:bg-black/25 transition-all duration-200 py-2 flex items-center justify-center gap-1.5"
                       title="View full content"
                     >
-                      <Expand className="w-3.5 h-3.5" />
-                      <span className="text-xs font-medium">Show all</span>
+                      <Expand className="w-3 h-3" />
+                      <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Expand</span>
                     </button>
                   )}
                 </div>
               )}
 
-              {/* Textarea for 'input' or 'edit' types */}
-              {(notificationType === 'input' || notificationType === 'edit') && (
+              {/* Textarea for 'input' type only */}
+              {notificationType === 'input' && (
                 <div className="mt-3">
                   <textarea
                     value={inputValue}
                     onChange={e => setInputValue(e.target.value)}
-                    placeholder={
-                      notificationType === 'edit' ? 'Edit the text above...' : placeholder || 'Enter your response...'
-                    }
+                    placeholder={placeholder || 'Enter your response...'}
                     className="w-full p-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 resize-none"
-                    rows={
-                      notificationType === 'edit'
-                        ? 8 // Fixed reasonable height for edit mode
-                        : 3 // Default for 'input' type
-                    }
+                    rows={3}
                   />
                 </div>
               )}
@@ -1130,7 +1131,11 @@ function getActionsForNotification(notification: CustomNotification, onAction: (
       ]
     case 'edit':
       return [
-        { label: 'Confirm', variant: 'primary' as const, onClick: () => onAction(notification.id, 'edit clicked') },
+        {
+          label: 'Review & Submit',
+          variant: 'primary' as const,
+          onClick: () => alert('Open in full window to edit and submit'),
+        },
       ]
     default:
       return []
