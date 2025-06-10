@@ -1,5 +1,7 @@
 const Pusher = require('pusher')
 
+console.log('PUSHER_SECRET', process.env.PUSHER_SECRET)
+
 const pusher = new Pusher({
   appId: '2006171',
   key: '37677dc9f2d0ad56109f',
