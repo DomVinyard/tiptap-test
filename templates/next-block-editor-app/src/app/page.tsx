@@ -6,6 +6,12 @@ import { formatDistanceToNow } from 'date-fns'
 
 const experiments = [
   {
+    id: 'candidates',
+    title: 'Candidates',
+    description: 'A new project for managing and displaying candidate information.',
+    date: '2025-06-10',
+  },
+  {
     id: 'notification-cards',
     title: 'Notification Cards',
     description:

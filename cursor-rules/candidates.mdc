@@ -1,0 +1,87 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Candidates Project
+
+## Overview
+The Candidates project is a real-time system for managing and visualizing candidate evaluation workflows. It demonstrates how candidates move through various evaluation states with live updates driven by backend websockets.
+
+## User Interface
+
+### Input Controls
+- **Agent Input**: A text field for specifying the agent/system that will process candidates
+- **Input Value**: A smaller text field for additional parameters or configuration values
+
+### Action Flow
+1. User enters agent name and input value
+2. System hits API endpoint to initiate the simulation
+3. Real-time updates stream via Pusher websockets
+4. Frontend displays and sorts candidates automatically
+
+## Backend Simulation
+
+### API Endpoint
+The system simulates two primary workflows:
+
+#### Candidate Lifecycle
+- **Creation**: Multiple candidates are generated
+- **State Progression**: Each candidate moves through defined states
+- **Evaluation Processing**: Candidates are run through all available evaluations
+
+#### Evaluation System
+- **Evaluation Creation**: Multiple evaluations are generated
+- **Candidate-Evaluation Mapping**: Each candidate is processed by every evaluation
+
+## Candidate States
+
+### State Definitions
+1. **starting**: Initial state when candidate is first created
+2. **failure**: Candidate failed during processing
+3. **evaluating**: Candidate is currently being evaluated
+4. **complete**: Candidate has successfully completed all evaluations
+
+### State Transitions
+```
+starting → evaluating → complete
+starting → evaluating → failure
+starting → failure
+```
+
+## Real-time Architecture
+
+### Pusher WebSockets
+- **Backend-Driven Logic**: All state changes and updates originate from the backend
+- **Live Updates**: Frontend receives real-time notifications for:
+  - New candidate creation
+  - State transitions
+  - Evaluation progress
+  - Completion status
+
+### Frontend Responsibilities
+- **Real-time Display**: Show current state of all candidates
+- **Automatic Sorting**: Sort candidates based on state, progress, or timestamp
+- **Live Updates**: React to websocket events without user intervention
+
+## Technical Implementation
+
+### Data Flow
+1. User input → API endpoint
+2. Backend creates candidates and evaluations
+3. Backend processes candidates through evaluation pipeline
+4. State changes broadcast via Pusher
+5. Frontend updates UI in real-time
+6. Frontend sorts and displays current state
+
+### Key Features
+- **No Polling**: All updates are push-based via websockets
+- **Real-time Sorting**: Candidates automatically reorder based on current state
+- **Lifecycle Visualization**: Clear representation of candidate progression
+- **Evaluation Tracking**: Monitor how candidates perform across different evaluations
+
+## Use Cases
+- Demonstrating real-time evaluation systems
+- Visualizing candidate assessment workflows
+- Testing websocket-driven UI updates
+- Simulating batch processing with live feedback
