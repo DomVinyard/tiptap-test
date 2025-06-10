@@ -300,17 +300,16 @@ export async function POST(request: Request) {
     })
 
     // Wait for all candidates to complete, then signal simulation end
-    Promise.all(promises).then(async () => {
-      await sleep(1000) // Brief pause before signaling completion
-      await pusher.trigger(channel, 'simulation-completed', {
-        timestamp: new Date().toISOString(),
-      })
+    await Promise.all(promises)
+    await sleep(1000) // Brief pause before signaling completion
+    await pusher.trigger(channel, 'simulation-completed', {
+      timestamp: new Date().toISOString(),
     })
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Simulation started',
+        message: 'Simulation completed',
         candidatesCount: candidates.length,
         evaluationsCount: evaluations.length,
       }),
