@@ -1,14 +1,15 @@
 'use client'
 
-import { ArrowLeft, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { ArrowLeft, ThumbsUp, ThumbsDown, Send, ChevronDown } from 'lucide-react'
 import { Agent, ChatMessage } from './TasksScreen'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface ChatScreenProps {
   agent: Agent
   onBack: () => void
   onApprove: (id: string) => void
   onDeny: (id: string) => void
+  onSendMessage: (agentId: string, content: string) => void
 }
 
 const ChatHeader = ({ agent, onBack }: { agent: Agent; onBack: () => void }) => (
@@ -52,6 +53,43 @@ const ActionPrompt = ({ onApprove, onDeny }: { onApprove: () => void; onDeny: ()
   </div>
 )
 
+const ChatInput = ({ onSend, showBorder = true }: { onSend: (content: string) => void; showBorder?: boolean }) => {
+  const [content, setContent] = useState('')
+
+  const handleSend = () => {
+    if (content.trim()) {
+      onSend(content)
+      setContent('')
+    }
+  }
+
+  return (
+    <div
+      className={`p-4 bg-white dark:bg-neutral-900 ${
+        showBorder && 'border-t border-neutral-200 dark:border-neutral-700'
+      }`}
+    >
+      <div className="relative">
+        <input
+          type="text"
+          value={content}
+          onChange={e => setContent(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSend()}
+          placeholder="Send a message..."
+          className="w-full bg-neutral-100 dark:bg-neutral-800 rounded-full px-4 py-2 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          onClick={handleSend}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 disabled:bg-neutral-400"
+          disabled={!content.trim()}
+        >
+          <Send className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
 const ChatMessageItem = ({ message, agent }: { message: ChatMessage; agent: Agent }) => {
   if (message.type === 'system') {
     return (
@@ -71,15 +109,27 @@ const ChatMessageItem = ({ message, agent }: { message: ChatMessage; agent: Agen
     <div className={`flex ${bubbleAlignment} my-2`}>
       <div className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-2 rounded-2xl ${bubbleStyle}`}>
         <p className="text-sm">{message.content}</p>
-        <p className={`text-xs mt-1 ${isUser ? 'text-blue-200' : 'text-neutral-400 dark:text-neutral-500'}`}>
-          {message.timestamp}
-        </p>
+        <div className="flex justify-between items-center mt-2">
+          <p className={`text-xs ${isUser ? 'text-blue-200' : 'text-neutral-400 dark:text-neutral-500'}`}>
+            {message.timestamp}
+          </p>
+          {message.details && (
+            <button
+              className={`flex items-center gap-1 font-medium text-xs ${
+                isUser ? 'text-blue-200 hover:text-white' : 'text-blue-500 hover:text-blue-600'
+              }`}
+            >
+              Show
+              <ChevronDown className="w-3 h-3" />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
 }
 
-const ChatScreen = ({ agent, onBack, onApprove, onDeny }: ChatScreenProps) => {
+const ChatScreen = ({ agent, onBack, onApprove, onDeny, onSendMessage }: ChatScreenProps) => {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -99,7 +149,12 @@ const ChatScreen = ({ agent, onBack, onApprove, onDeny }: ChatScreenProps) => {
           {agent.chatHistory.map(message => (
             <ChatMessageItem key={message.id} message={message} agent={agent} />
           ))}
-          {needsAction && (
+          <div ref={scrollRef} />
+        </div>
+      </div>
+      <div className="mt-auto">
+        {needsAction && (
+          <div className="p-4 border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
             <ActionPrompt
               onApprove={() => {
                 onApprove(agent.id)
@@ -110,9 +165,9 @@ const ChatScreen = ({ agent, onBack, onApprove, onDeny }: ChatScreenProps) => {
                 onBack()
               }}
             />
-          )}
-          <div ref={scrollRef} />
-        </div>
+          </div>
+        )}
+        <ChatInput onSend={content => onSendMessage(agent.id, content)} showBorder={!needsAction} />
       </div>
     </div>
   )

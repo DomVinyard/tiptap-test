@@ -152,6 +152,7 @@ export default function June24Page() {
   const [activeTab, setActiveTab] = useState('tasks')
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null)
   const [addScreenMessages, setAddScreenMessages] = useState<Message[]>([])
+  const [filter, setFilter] = useState('all')
   const [actionToConfirm, setActionToConfirm] = useState<
     | {
         action: 'approve' | 'deny' | 'delete' | 'toggleDisable'
@@ -365,10 +366,41 @@ export default function June24Page() {
     setSelectedAgent(null)
   }
 
+  const handleSendMessage = (agentId: string, content: string) => {
+    const agent = agents.find(a => a.id === agentId)
+    if (!agent) return
+
+    const newMessage: ChatMessage = {
+      id: new Date().toISOString(),
+      type: 'user',
+      content,
+      timestamp: 'Just now',
+    }
+
+    updateAgent(agentId, {
+      chatHistory: [...agent.chatHistory, newMessage],
+    })
+  }
+
+  const filteredAgents = agents.filter(agent => {
+    if (filter === 'all') return true
+    if (filter === 'active') return agent.status === 'waiting'
+    if (filter === 'running') return agent.status === 'running'
+    if (filter === 'scheduled') return agent.status === 'scheduled'
+    if (filter === 'drafts') return agent.status === 'disabled'
+    return true
+  })
+
   const renderScreen = () => {
     if (selectedAgent) {
       return (
-        <ChatScreen agent={selectedAgent} onBack={handleBackToTasks} onApprove={handleApprove} onDeny={handleDeny} />
+        <ChatScreen
+          agent={selectedAgent}
+          onBack={handleBackToTasks}
+          onApprove={handleApprove}
+          onDeny={handleDeny}
+          onSendMessage={handleSendMessage}
+        />
       )
     }
 
@@ -376,12 +408,14 @@ export default function June24Page() {
       case 'tasks':
         return (
           <TasksScreen
-            agents={agents}
+            agents={filteredAgents}
             deleteAgent={handleDeleteRequest}
             onApprove={handleApprove}
             onDeny={handleDeny}
             onToggleDisable={handleToggleDisable}
             onAgentSelect={handleSelectAgent}
+            filter={filter}
+            onFilterChange={setFilter}
           />
         )
       case 'add':
@@ -417,8 +451,8 @@ export default function June24Page() {
           <div className="grow-[2] shrink basis-0 flex justify-center items-center">
             <MobileFrame>
               <div className="h-full relative">
-                <div className="h-full pb-16 overflow-y-auto">{renderScreen()}</div>
-                <TabBar activeTab={activeTab} onTabChange={handleTabChange} />
+                <div className={`h-full overflow-y-auto ${!selectedAgent && 'pb-20'}`}>{renderScreen()}</div>
+                {!selectedAgent && <TabBar activeTab={activeTab} onTabChange={handleTabChange} />}
                 <ActionConfirmationModal
                   isOpen={!!actionToConfirm}
                   title={actionToConfirm?.title || ''}

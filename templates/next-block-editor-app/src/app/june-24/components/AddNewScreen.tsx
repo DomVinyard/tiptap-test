@@ -120,7 +120,7 @@ const AddNewScreen = ({ messages, setMessages }: AddNewScreenProps) => {
               value={userMessage}
               onChange={e => setUserMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
+              placeholder="I want you to..."
               className="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-2xl bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={1}
               style={{ minHeight: '44px' }}

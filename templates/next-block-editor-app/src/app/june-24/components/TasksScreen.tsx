@@ -1,6 +1,6 @@
 'use client'
 
-import { Trash2, ThumbsUp, ThumbsDown, PowerIcon } from 'lucide-react'
+import { Trash2, ThumbsUp, ThumbsDown, PowerIcon, ChevronDown } from 'lucide-react'
 import {
   SwipeableList,
   SwipeableListItem,
@@ -11,12 +11,15 @@ import {
 } from 'react-swipeable-list'
 import 'react-swipeable-list/dist/styles.css'
 import { Spinner } from '@/components/ui/Spinner'
+import { Menu, Item as PopoverItem } from '@/components/ui/PopoverMenu'
+import { Button } from '@/components/ui/Button'
 
 export type ChatMessage = {
   id: string
   type: 'user' | 'agent' | 'system'
   content: string
   timestamp: string
+  details?: string[]
 }
 
 export interface Agent {
@@ -60,7 +63,20 @@ export const defaultAgents: Agent[] = [
         content: 'Archived. The next scan is scheduled for tomorrow.',
         timestamp: 'Tue 10:05 AM',
       },
-      { id: 'msg8', type: 'agent', content: 'Found 47 emails that can be archived.', timestamp: '9:54 AM' },
+      {
+        id: 'msg8',
+        type: 'agent',
+        content: 'Found 47 emails that can be archived.',
+        timestamp: '9:54 AM',
+        details: [
+          'Coffee subscription receipt',
+          'Weekly project update',
+          'Your flight is confirmed',
+          'Team lunch today at 12?',
+          "Re: Yesterday's meeting",
+          '... and 42 more',
+        ],
+      },
       { id: 'msg9', type: 'agent', content: 'Confirm that you want to archive these 47 emails.', timestamp: '9:55 AM' },
     ],
   },
@@ -115,6 +131,7 @@ export const defaultAgents: Agent[] = [
         type: 'agent',
         content: 'Detected new invoice #INV-2024-001 from "Acme Corp"',
         timestamp: '8:53 AM',
+        details: ['Vendor: Acme Corp', 'Invoice ID: #INV-2024-001', 'Amount: $2,450.00', 'Due Date: 2024-07-30'],
       },
       { id: 'msg3', type: 'agent', content: 'Do you want to approve the invoice for $2,450?', timestamp: '8:54 AM' },
     ],
@@ -150,9 +167,20 @@ interface TasksScreenProps {
   onToggleDisable: (id: string) => void
   deleteAgent: (id: string) => void
   onAgentSelect: (agent: Agent) => void
+  filter: string
+  onFilterChange: (filter: string) => void
 }
 
-const TasksScreen = ({ agents, onApprove, onDeny, onToggleDisable, deleteAgent, onAgentSelect }: TasksScreenProps) => {
+const TasksScreen = ({
+  agents,
+  onApprove,
+  onDeny,
+  onToggleDisable,
+  deleteAgent,
+  onAgentSelect,
+  filter,
+  onFilterChange,
+}: TasksScreenProps) => {
   // Sort agents: waiting (with unreads) first, then scheduled, then disabled
   const sortedAgents = [...agents].sort((a, b) => {
     if (a.status === 'waiting' && b.status !== 'waiting') return -1
@@ -161,6 +189,16 @@ const TasksScreen = ({ agents, onApprove, onDeny, onToggleDisable, deleteAgent, 
     if (b.status === 'disabled' && a.status !== 'disabled') return -1
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   })
+
+  const filterOptions = [
+    { value: 'all', label: 'Show All' },
+    { value: 'active', label: 'Active' },
+    { value: 'running', label: 'Running' },
+    { value: 'scheduled', label: 'Scheduled' },
+    { value: 'drafts', label: 'Drafts' },
+  ]
+
+  const currentFilterLabel = filterOptions.find(o => o.value === filter)?.label
 
   const getStatusText = (agent: Agent) => {
     switch (agent.status) {
@@ -238,8 +276,21 @@ const TasksScreen = ({ agents, onApprove, onDeny, onToggleDisable, deleteAgent, 
     return (
       <div className="h-full bg-white dark:bg-neutral-900">
         {/* Header */}
-        <div className="flex items-center p-4 border-b border-neutral-200 dark:border-neutral-700">
+        <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
           <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Assignments</h1>
+          <Menu
+            customTrigger
+            trigger={
+              <div className="flex items-center gap-1 cursor-pointer">
+                <span className="text-sm font-medium text-blue-500 dark:text-blue-400">{currentFilterLabel}</span>
+                <ChevronDown className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+              </div>
+            }
+          >
+            {filterOptions.map(option => (
+              <PopoverItem key={option.value} label={option.label} onClick={() => onFilterChange(option.value)} />
+            ))}
+          </Menu>
         </div>
 
         <div className="flex items-center justify-center h-64">
@@ -260,8 +311,21 @@ const TasksScreen = ({ agents, onApprove, onDeny, onToggleDisable, deleteAgent, 
   return (
     <div className="h-full bg-white dark:bg-neutral-900">
       {/* Header */}
-      <div className="flex items-center px-4 py-4 border-b border-neutral-200 dark:border-neutral-700">
+      <div className="flex items-center justify-between px-4 py-4 border-b border-neutral-200 dark:border-neutral-700">
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Assignments</h1>
+        <Menu
+          customTrigger
+          trigger={
+            <div className="flex items-center gap-1 cursor-pointer">
+              <span className="text-sm font-medium text-blue-500 dark:text-blue-400">{currentFilterLabel}</span>
+              <ChevronDown className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+            </div>
+          }
+        >
+          {filterOptions.map(option => (
+            <PopoverItem key={option.value} label={option.label} onClick={() => onFilterChange(option.value)} />
+          ))}
+        </Menu>
       </div>
 
       {/* Chat List */}
@@ -285,11 +349,7 @@ const TasksScreen = ({ agents, onApprove, onDeny, onToggleDisable, deleteAgent, 
                 {/* Avatar */}
                 <div className="flex-shrink-0">
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-xl ${
-                      agent.status === 'disabled'
-                        ? 'bg-neutral-200 dark:bg-neutral-700'
-                        : 'bg-neutral-200 dark:bg-neutral-700'
-                    }`}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center text-xl bg-neutral-200 dark:bg-neutral-700`}
                   >
                     {agent.avatar}
                   </div>
@@ -299,13 +359,7 @@ const TasksScreen = ({ agents, onApprove, onDeny, onToggleDisable, deleteAgent, 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-1">
                     <div className="flex-1 min-w-0">
-                      <h3
-                        className={`font-medium text-base truncate ${
-                          agent.unreadCount > 0
-                            ? 'text-neutral-900 dark:text-neutral-100'
-                            : 'text-neutral-800 dark:text-neutral-200'
-                        }`}
-                      >
+                      <h3 className={`font-medium text-base truncate ${'text-neutral-900 dark:text-neutral-100'}`}>
                         {agent.name}
                       </h3>
                       {/* Status text directly below title */}
