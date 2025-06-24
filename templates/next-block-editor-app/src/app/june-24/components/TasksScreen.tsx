@@ -127,7 +127,7 @@ export const defaultAgents: Agent[] = [
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
     lastMessage: 'Agent disabled by user',
     lastMessageTime: 'Yesterday',
-    avatar: '��',
+    avatar: '💸',
     chatHistory: [{ id: 'msg1', type: 'system', content: 'Agent has been disabled.', timestamp: 'Yesterday' }],
   },
   {

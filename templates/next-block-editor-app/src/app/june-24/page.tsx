@@ -35,10 +35,23 @@ const ConfigurationPanel = () => (
   <Surface className="h-full p-6">
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-4">Configuration Panel</h2>
-        <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
-          Use the controls below to configure the mobile app experience.
+        <h2 className="text-xl font-semibold mb-4">Sauna Messenger Concept</h2>
+        <p className="text-base text-neutral-600 dark:text-neutral-400 mb-6">
+          This prototype explores a mobile experience for managing automated agents by fully embracing a messenger
+          interface paradigm.
         </p>
+        <div className="text-base text-neutral-600 dark:text-neutral-400 space-y-4">
+          <h3 className="text-lg font-semibold text-neutral-800 dark:text-neutral-200">The Unified Chat Interface</h3>
+          <p>
+            The main difference in this approach is that we bundle the agent's activity log and the human-in-the-loop
+            tasks into the <span className="font-semibold">same chat interface</span>.
+          </p>
+          <p>
+            Rather than presenting actions as separate UI elements, every notification, status update, and approval
+            request becomes an object in the conversation stream. This creates a single, seamless thread for each agent,
+            making a complex workflow feel as natural as a text conversation.
+          </p>
+        </div>
       </div>
     </div>
   </Surface>
