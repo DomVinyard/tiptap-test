@@ -139,8 +139,8 @@ const TabBar = ({ activeTab, onTabChange }: { activeTab: string; onTabChange: (t
                 {/* Elevated Add Button - larger circle cropped at bottom */}
                 <button
                   onClick={() => onTabChange(tab.id)}
-                  className="absolute bottom-0 w-20 h-20 bg-neutral-900 dark:bg-neutral-100 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105"
-                  style={{ transform: 'translateY(4px)' }}
+                  className="absolute bottom-0 w-[70px] h-[70px] bg-neutral-900 dark:bg-neutral-100 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105"
+                  style={{ transform: 'translateY(-4px)' }}
                 >
                   <Icon className="w-8 h-8 text-white dark:text-neutral-900" />
                 </button>
@@ -307,7 +307,7 @@ const AddNewScreen = ({
       </div>
 
       {/* Message Input */}
-      <div className="px-4 py-2 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800">
+      <div className="px-4 py-1.5 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800">
         <div className="flex items-center space-x-2">
           <div className="flex-1">
             <textarea
