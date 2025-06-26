@@ -1,0 +1,178 @@
+{
+  "title": "Nightly Email Archiver",
+  "trigger": "SCHEDULE: 0 2 * * * America/New_York",
+  "purpose": [
+    {
+      "very_simple": "Clear low-priority emails from the inbox every night.",
+      "medium": "Each night, the agent reviews the inbox and relocates emails judged as non-important to the \"Archive\" label so the user wakes to a cleaner inbox.",
+      "complete": "The assignment keeps the user's inbox focused on what matters by automatically identifying messages that do not require attention—based on sender, keywords, thread activity, and past user feedback—and then moving them to an \"Archive\" label during the night. This preserves all mail while preventing clutter, freeing the user to concentrate on high-value correspondence."
+    }
+  ],
+  "workflow_steps": [
+    {
+      "very_simple": "Collect yesterday's emails.",
+      "medium": "Open the primary inbox and gather all emails received since the last nightly run.",
+      "complete": "Read the user's primary inbox and produce a list of all emails that arrived after the previous nightly archive cycle. Include metadata such as sender, subject line, labels, thread participation, and whether the message is starred or marked important."
+    },
+    {
+      "very_simple": "Judge each email's importance.",
+      "medium": "Decide if each message is important or not.",
+      "complete": "For every email in the list, evaluate its importance by looking at factors like whether the sender is in the user's contacts, if the message is starred or in a priority label, contains urgent keywords, or matches topics the user usually responds to quickly. Combine these signals with remembered user feedback on past decisions."
+    },
+    {
+      "very_simple": "Archive non-important messages.",
+      "medium": "Move emails marked non-important to the \"Archive\" label.",
+      "complete": "For every email deemed non-important, apply the Gmail \"Archive\" action (or equivalent in the connected mail service). Verify that the message no longer appears in the inbox but remains searchable under the Archive label."
+    },
+    {
+      "very_simple": "Record patterns.",
+      "medium": "Note any new clues about what the user sees as important.",
+      "complete": "After processing, store brief observations—for example, new trusted senders, keywords often ignored, or labels frequently left untouched—so future runs refine the importance test without lengthening this assignment."
+    },
+    {
+      "very_simple": "Send a summary.",
+      "medium": "Let the user know what was moved.",
+      "complete": "Compose a brief daily report listing how many emails were archived and highlighting any edge cases held back for review. Deliver it by email so the user can quickly scan the results each morning."
+    }
+  ],
+  "guidance": [
+    {
+      "guidance": {
+        "very_simple": "Never archive starred or flagged emails.",
+        "medium": "Treat starred, flagged, or already labeled as priority emails as automatically important and leave them untouched.",
+        "complete": "When scanning the inbox, any message that the user has starred, flagged, replied to, or placed in a high-priority label must be considered important by default. Skip these messages entirely in the archiving step to avoid removing items the user clearly values."
+      }
+    },
+    {
+      "guidance": {
+        "very_simple": "Ask if unsure.",
+        "medium": "Hold borderline emails for human confirmation.",
+        "complete": "If an email's importance cannot be reasonably decided—such as a first-time sender containing mixed signals—do not archive it automatically. Instead, keep it in the inbox and list it under \"Needs Review\" in the daily summary so the user can provide feedback."
+      }
+    }
+  ],
+  "ask_me": [
+    {
+      "ask_item": {
+        "very_simple": "Uncertain importance on an email.",
+        "medium": "If the agent cannot confidently decide whether a specific email is important, escalate.",
+        "complete": "Escalate to the user whenever an email exhibits conflicting signals—e.g., it is from an unknown sender but discusses a common project keyword—so the user can label it important or not, and the choice can be remembered for future runs."
+      }
+    }
+  ],
+  "risks": {
+    "intent_ambiguity": [
+      {
+        "area": "It's unclear how \"non-important\" is defined—are keywords, sender reputation, or past behaviour weighted, and if so how?",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      },
+      {
+        "area": "It's unclear which mail platform (Gmail, Outlook, IMAP) the agent must act on, affecting available archive actions.",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      },
+      {
+        "area": "It's unclear what happens to borderline messages after user feedback—how is that feedback integrated?",
+        "simple": true,
+        "medium": false,
+        "complete": false
+      },
+      {
+        "area": "It's unclear whether the daily summary email should include the full list of archived subjects or just counts.",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      }
+    ],
+    "execution_risk": [
+      {
+        "area_describe": "Automated importance classification may mis-label and archive critical emails if signals are mis-interpreted.",
+        "simple": true,
+        "medium": true,
+        "complete": true
+      },
+      {
+        "area_describe": "Time-window calculation (\"yesterday\" vs \"since last run\") can cause emails to be skipped or double-processed.",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      },
+      {
+        "area_describe": "Applying the Archive label requires correct API endpoints and permissions that differ by provider.",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      },
+      {
+        "area_describe": "Summary email dispatch could fail silently if SMTP / API credentials expire.",
+        "simple": true,
+        "medium": true,
+        "complete": true
+      }
+    ],
+    "readability": {
+      "simple": {
+        "score": 90,
+        "reasoning": "Very short sentences, no technical jargon—easy for any user to skim."
+      },
+      "medium": {
+        "score": 80,
+        "reasoning": "Still concise but introduces mild jargon like \"primary inbox\" and \"Archive label\"."
+      },
+      "complete": {
+        "score": 70,
+        "reasoning": "Longer sentences with nested clauses and multiple criteria make it denser for non-technical readers."
+      }
+    },
+    "executability": {
+      "simple": {
+        "score": 60,
+        "reasoning": "This version omits key technical specifics (API targets, time filters), so an agent will need extra inference or human queries."
+      },
+      "medium": {
+        "score": 80,
+        "reasoning": "This version adds timing scope and clearer actions, but still lacks full detail on data structures and platform APIs."
+      },
+      "complete": {
+        "score": 90,
+        "reasoning": "This version enumerates metadata fields, decision criteria, verification steps, and escalation paths—nearly turnkey for a standard reAct agent."
+      }
+    }
+  },
+  "memory": {
+    "areas": [
+      {
+        "description": "User definitions of important vs non-important emails (e.g., trusted senders, ignored keywords).",
+        "derivation": "Collected from user confirmations when borderline emails are escalated.",
+        "how_improved": "Future runs tune the importance classifier, reducing false positives.",
+        "risks": "Remembering outdated or context-specific preferences could mis-classify future messages."
+      },
+      {
+        "description": "List of recently archived senders/threads that never trigger importance flags.",
+        "derivation": "Extracted from each execution's archive list.",
+        "how_improved": "Agent can auto-archive similar future emails faster without re-evaluation.",
+        "risks": "Over-generalising may hide new important messages from the same sender."
+      },
+      {
+        "description": "Preferred summary granularity (full list vs count only).",
+        "derivation": "Captured when user edits notification settings via ask-me feedback.",
+        "how_improved": "Summaries align with user preference, improving satisfaction.",
+        "risks": "Stale preference may persist if user's needs change but they don't update the setting."
+      }
+    ]
+  },
+  "representation": {
+    "simple": {
+      "markdown": "# Nightly Email Archiver\n\n### Schedule\nSCHEDULE: 0 2 * * * America/New_York\n\n### Purpose\nClear low-priority emails from the inbox every night.\n\n### Steps\n1. Collect yesterday's emails.\n2. Judge each email's importance.\n3. Archive non-important messages.\n4. Record patterns.\n5. Send a summary.\n\n### Guidance\n- Never archive starred or flagged emails.\n- Ask if unsure.\n\n### Ask Me\n- Uncertain importance on an email.\n"
+    },
+    "medium": {
+      "markdown": "# Nightly Email Archiver\n\n### Schedule\nSCHEDULE: 0 2 * * * America/New_York\n\n### Purpose\nEach night, the agent reviews the inbox and relocates emails judged as non-important to the \"Archive\" label so the user wakes to a cleaner inbox.\n\n### Steps\n1. Open the primary inbox and gather all emails received since the last nightly run.\n2. Decide if each message is important or not.\n3. Move emails marked non-important to the \"Archive\" label.\n4. Note any new clues about what the user sees as important.\n5. Let the user know what was moved.\n\n### Guidance\n- Treat starred, flagged, or already labeled as priority emails as automatically important and leave them untouched.\n- Hold borderline emails for human confirmation.\n\n### Ask Me\n- If the agent cannot confidently decide whether a specific email is important, escalate.\n"
+    },
+    "complete": {
+      "markdown": "# Nightly Email Archiver\n\n### Schedule\nSCHEDULE: 0 2 * * * America/New_York\n\n### Purpose\nThe assignment keeps the user's inbox focused on what matters by automatically identifying messages that do not require attention—based on sender, keywords, thread activity, and past user feedback—and then moving them to an \"Archive\" label during the night. This preserves all mail while preventing clutter, freeing the user to concentrate on high-value correspondence.\n\n### Steps\n1. Read the user's primary inbox and produce a list of all emails that arrived after the previous nightly archive cycle. Include metadata such as sender, subject line, labels, thread participation, and whether the message is starred or marked important.\n2. For every email in the list, evaluate its importance by looking at factors like whether the sender is in the user's contacts, if the message is starred or in a priority label, contains urgent keywords, or matches topics the user usually responds to quickly. Combine these signals with remembered user feedback on past decisions.\n3. For every email deemed non-important, apply the Gmail \"Archive\" action (or equivalent in the connected mail service). Verify that the message no longer appears in the inbox but remains searchable under the Archive label.\n4. After processing, store brief observations—for example, new trusted senders, keywords often ignored, or labels frequently left untouched—so future runs refine the importance test without lengthening this assignment.\n5. Compose a brief daily report listing how many emails were archived and highlighting any edge cases held back for review. Deliver it by email so the user can quickly scan the results each morning.\n\n### Guidance\n- When scanning the inbox, any message that the user has starred, flagged, replied to, or placed in a high-priority label must be considered important by default. Skip these messages entirely in the archiving step to avoid removing items the user clearly values.\n- If an email's importance cannot be reasonably decided—such as a first-time sender containing mixed signals—do not archive it automatically. Instead, keep it in the inbox and list it under \"Needs Review\" in the daily summary so the user can provide feedback.\n\n### Ask Me\n- Escalate to the user whenever an email exhibits conflicting signals—e.g., it is from an unknown sender but discusses a common project keyword—so the user can label it important or not, and the choice can be remembered for future runs.\n"
+    }
+  }
+}

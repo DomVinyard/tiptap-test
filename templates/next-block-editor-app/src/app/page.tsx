@@ -6,10 +6,17 @@ import { formatDistanceToNow } from 'date-fns'
 
 const experiments = [
   {
-    id: 'june-24',
-    title: 'June 24 Mobile Experiment',
+    id: 'sample-assignments',
+    title: 'Sauna Sample Assignments',
     description:
-      'A mobile app experiment with configuration panel and hello world placeholders, featuring the same layout as notification cards.',
+      'A sidebar of items, with a document view on the right. Each document is injected from a markdown file.',
+    date: '2025-06-25',
+  },
+  {
+    id: 'june-24',
+    title: 'Sauna Messenger Concept',
+    description:
+      'This prototype explores a mobile experience for managing automated agents by fully embracing a messenger interface paradigm..',
     date: '2025-06-24',
   },
   {
