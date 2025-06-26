@@ -1,0 +1,105 @@
+{
+  "representation": {
+    "simple": {
+      "markdown": "# Daily CRM Deduplication\n\n### Schedule\nSCHEDULE: 0 7 * * * America/New_York\n\n### Purpose\nFind and handle duplicate CRM records every morning.\n\n### Steps\n1. Pull a fresh list of all CRM records.\n2. Detect exact duplicates.\n3. Merge the certain duplicates.\n4. Identify possible duplicates.\n5. Flag possible duplicates for review.\n6. Send a daily summary.\n7. Remember edge cases.\n\n### Guidance\n- Never delete data without a merge or human approval.\n- Use email as the strongest match signal.\n- Keep the CRM audit trail intact.\n\n### Ask Me\n- Unsure if two records are duplicates.\n- Field mapping confusion during merge.\n"
+    },
+    "medium": {
+      "markdown": "# Daily CRM Deduplication\n\n### Schedule\nSCHEDULE: 0 7 * * * America/New_York\n\n### Purpose\nEach morning the agent searches the CRM for records that appear to be duplicates and either merges clear matches or flags uncertain cases for human review.\n\n### Steps\n1. Use the CRM app connection to retrieve every contact and company record along with key identifiers such as name email and phone.\n2. Compare records for identical primary identifiers and mark those as certain duplicates.\n3. Combine each set of certain duplicates into a single record while keeping the most complete data.\n4. Look for near matches where names are similar or emails differ slightly and mark them as possible duplicates.\n5. Create a task or apply a tag in the CRM to alert users about each possible duplicate pair.\n6. Email a summary of merged and flagged records to the data team.\n7. Store examples of borderline cases to improve future detection.\n\n### Guidance\n- The agent must avoid any destructive action unless it is part of an explicit merge or has clear human approval.\n- Email addresses should overrule other fields when judging duplicates.\n- Ensure merges preserve notes activities and ownership data.\n\n### Ask Me\n- When the agent finds records with conflicting data such as different company names but the same phone number ask a human to confirm before merging.\n- If the CRM presents multiple custom fields with unclear priorities ask which value to keep.\n"
+    },
+    "complete": {
+      "markdown": "# Daily CRM Deduplication\n\n### Schedule\nSCHEDULE: 0 7 * * * America/New_York\n\n### Purpose\nThe agent helps keep the CRM clean by scanning all contact and company records every morning. It automatically merges entries that are obviously identical—based on exact email or phone matches—while creating a visible flag or task for any records that might be duplicates but need human confirmation. This preserves data quality without risking accidental data loss.\n\n### Steps\n1. Invoke the CRM integration to download a complete up to date list of contacts and companies. Ensure each record contains its unique CRM identifier and commonly duplicated fields like names emails phone numbers and company names so duplicates can be detected accurately.\n2. Run a comparison across the fetched dataset focusing on exact matches of unique fields such as email address or phone number. For any set of records where these fields match perfectly label them as certain duplicates requiring no human input.\n3. For every group of records classified as certain duplicates select one to serve as the master. Copy over any missing field values from the others then call the CRM merge endpoint so only the master remains. Preserve activity history and notes from all merged records.\n4. Apply a loose matching algorithm that checks for high similarity in names or partially matching emails and phone numbers. When confidence is moderate add these record pairs to a list of possible duplicates that should be confirmed by a human before any merge occurs.\n5. For every possible duplicate set add a visible flag in the CRM—such as a tag named Needs duplicate review or a task assigned to the data management team—so that humans can quickly locate and assess these records.\n6. Compile a concise report that lists how many records were automatically merged and details of each flagged duplicate pair. Email this summary to the designated data quality inbox so stakeholders know what was handled and what needs their attention.\n7. Save notes about ambiguous duplicates and the user decisions made on them to long term memory. This helps refine what the user considers a safe automatic merge versus a manual review case in subsequent runs.\n\n### Guidance\n- Under no circumstance should a record be permanently deleted. Only perform merges for records classified as certain duplicates. Any uncertain pair must remain separate until a human approves the merge.\n- If two records share an identical email address they are considered the same entity even if other fields differ. Treat this match as high confidence and proceed with automatic merging.\n- When merging records the agent must choose options that retain all existing notes tasks meetings and user ownership assignments so no historical context is lost.\n\n### Ask Me\n- If potential duplicates show mixed signals—one field matches but others conflict—the agent should pause and create an action item asking the CRM admin whether these records should be merged or kept separate. Only proceed after clear guidance.\n- When merging records that contain overlapping custom fields with differing values and no obvious rule of precedence the agent should escalate to a human. Seek clarification on which field values to preserve and then remember the decision for future automatic merges.\n"
+    }
+  },
+  "risks": {
+    "intent_ambiguity": [
+      {
+        "area": "It's unclear which specific CRM platform or API the agent should connect to.",
+        "simple": true,
+        "medium": true,
+        "complete": true
+      },
+      {
+        "area": "It's unclear what confidence threshold distinguishes a possible duplicate from a certain duplicate; only broad hints are given.",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      },
+      {
+        "area": "It's unclear exactly who should receive the daily summary email (\"data team\" / \"data quality inbox\") and what address to use.",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      }
+    ],
+    "execution_risk": [
+      {
+        "area_describe": "The agent may hit authentication or rate-limit errors when pulling an entire CRM dataset each morning.",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      },
+      {
+        "area_describe": "Automatic merges could overwrite or discard valuable field data if record-merging rules are mis-applied.",
+        "simple": true,
+        "medium": true,
+        "complete": true
+      },
+      {
+        "area_describe": "The fuzzy-matching algorithm for 'possible duplicates' may be slow or inaccurate on very large datasets.",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      }
+    ],
+    "readability": {
+      "simple": {
+        "score": 92,
+        "reasoning": "Short bullet-style language and only seven numbered steps keep it very easy to skim."
+      },
+      "medium": {
+        "score": 74,
+        "reasoning": "Adds detail and longer sentences, but still mostly plain language; some CRM jargon slips in."
+      },
+      "complete": {
+        "score": 58,
+        "reasoning": "Lengthy sentences, parenthetical qualifiers and many technical phrases make it harder for a non-technical reader."
+      }
+    },
+    "executability": {
+      "simple": {
+        "score": 62,
+        "reasoning": "This version omits tool names, data schemas, and merge logic, leaving large gaps an agent must improvise."
+      },
+      "medium": {
+        "score": 81,
+        "reasoning": "This version specifies data fields, merge versus flag branching, and an email step—enough for most reAct agents to implement with moderate prompts."
+      },
+      "complete": {
+        "score": 93,
+        "reasoning": "This version calls out identifiers, merge endpoint use, preservation of history, and explicit tagging, providing near-executable specificity."
+      }
+    }
+  },
+  "memory": {
+    "areas": [
+      {
+        "description": "What the user considers a 'possible' versus 'certain' duplicate.",
+        "derivation": "Remember decisions made after human confirmations during Ask-Me escalations.",
+        "how_improved": "Thresholds can be auto-tuned so future runs classify duplicates more accurately, reducing manual reviews.",
+        "risks": "Storing incorrect thresholds could widen false positives or negatives."
+      },
+      {
+        "description": "Preferred field-precedence rules when merging records.",
+        "derivation": "Capture the human's choices each time the agent asks which value to keep.",
+        "how_improved": "Over time, merges become fully automated for common field conflicts.",
+        "risks": "Mis-remembered precedence could overwrite critical data across many records."
+      },
+      {
+        "description": "Correct recipient list for daily summary reports.",
+        "derivation": "Extract email addresses from the first successful manual send or from human input.",
+        "how_improved": "Prevents future delivery failures and removes guesswork about who needs the report.",
+        "risks": "If the wrong address is stored the team could miss important notifications."
+      }
+    ]
+  }
+}

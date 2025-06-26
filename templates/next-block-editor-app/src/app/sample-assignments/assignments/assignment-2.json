@@ -1,0 +1,123 @@
+{
+  "representation": {
+    "simple": {
+      "markdown": "# 3-Bullet Meeting Recapper\n\n### Trigger\nEMAIL\n\n### Purpose\nTurn new meeting transcripts into a three-bullet email recap.\n\n### Steps\n1. Save the incoming transcript.\n2. Summarise into three bullets.\n3. Identify attendee emails.\n4. Send recap to attendees.\n5. Remember style preferences.\n\n### Guidance\n- Keep the recap to exactly three bullets.\n- Send only to confirmed attendees.\n\n### Ask Me\n- Attendee list is unclear.\n"
+    },
+    "medium": {
+      "markdown": "# 3-Bullet Meeting Recapper\n\n### Trigger\nEMAIL\n\n### Purpose\nWhenever a fresh meeting transcript arrives, create a concise, three-bullet summary and email it to everyone who attended.\n\n### Steps\n1. Download the transcript attachment or copy the email body into a working document for processing.\n2. Use language-model tools to generate exactly three concise bullets covering key outcomes and action items.\n3. Pull the attendee list from the email headers or the transcript metadata.\n4. Compose a brief email containing the three bullets and send it to every attendee.\n5. Store any user corrections on tone or format for future recaps.\n\n### Guidance\n- Always produce exactly three clear, actionable bullets—no more, no less—and double-check that each bullet reflects a unique takeaway.\n- Do not email anyone whose attendance is uncertain; escalate if attendee list is unclear.\n\n### Ask Me\n- If you cannot definitively determine all attendee email addresses, ask the user for the list before sending.\n"
+    },
+    "complete": {
+      "markdown": "# 3-Bullet Meeting Recapper\n\n### Trigger\nEMAIL\n\n### Purpose\nWhen a new email containing a meeting transcript lands in the inbox, the agent should read the transcript, distill the discussion into exactly three clear bullet points that capture the main decisions, action items and next steps, then send that recap by email to all meeting attendees so everyone stays aligned without having to read the full transcript.\n\n### Steps\n1. Detect whether the transcript is attached or embedded in the email body; if attached, download it, otherwise copy the text content into a temporary document so it is easy to process and reference during summarisation.\n2. Run the transcript through a summarisation prompt that instructs the model to produce precisely three numbered or bulleted lines that collectively cover decisions made, responsibilities assigned and any next steps, avoiding redundant detail or generic statements.\n3. Collect recipient addresses from the original meeting invite headers if present; if missing, scan the first page or header of the transcript for a participant list; compile a deduplicated list of attendee email addresses for distribution.\n4. Draft an email whose subject references the meeting title and date, place the three-bullet recap in the body, attach the full transcript for reference, and send it to all identified attendees, placing yourself in CC for record-keeping.\n5. If the user later edits the bullet style, tone or length, store those preferences in memory so subsequent summaries automatically follow the preferred style without asking again.\n\n### Guidance\n- The summary must contain precisely three distinct bullet points; avoid sub-bullets or paragraphs. Each bullet should communicate a unique decision, action item or follow-up. If the transcript lacks three substantial points, still produce three concise bullets by combining minor points as needed rather than reducing the count.\n- Before sending the recap, confirm that every email address belongs to someone who attended the meeting. If the attendee list cannot be confidently derived from headers or transcript metadata, pause and ask the user to supply or confirm the correct recipients rather than guessing, to avoid sharing potentially sensitive information with unintended parties.\n\n### Ask Me\n- When the email headers lack clear participant data and the transcript does not list attendees—or if there is conflicting information—pause and request the correct recipient list from the human to ensure the recap is sent only to intended participants.\n"
+    }
+  },
+  "risks": {
+    "intent_ambiguity": [
+      {
+        "area": "It's unclear whether the trigger should activate on any email that merely mentions a transcript versus only system-generated meeting transcript messages.",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      },
+      {
+        "area": "It's unclear how to define which three points are most important (decisions, tasks, or general highlights).",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      },
+      {
+        "area": "It's unclear what to do if attendee addresses cannot be found at all—delay, skip, or forward to organizer.",
+        "simple": true,
+        "medium": false,
+        "complete": false
+      },
+      {
+        "area": "It's unclear how 'style preferences' should be represented and prioritised when multiple users edit the recap.",
+        "simple": true,
+        "medium": true,
+        "complete": true
+      }
+    ],
+    "execution_risk": [
+      {
+        "area_describe": "Transcript ingestion may fail because the file is in a proprietary format (e.g. .vtt) or the text is embedded within HTML.",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      },
+      {
+        "area_describe": "LLM may output more or fewer than exactly three bullets, violating the guidance.",
+        "simple": true,
+        "medium": true,
+        "complete": true
+      },
+      {
+        "area_describe": "Attendee extraction from headers or transcript could mis-parse names, leading to wrong or missing recipients.",
+        "simple": true,
+        "medium": true,
+        "complete": false
+      },
+      {
+        "area_describe": "Email delivery could be blocked by company policy or spam filters, especially with attachments.",
+        "simple": true,
+        "medium": true,
+        "complete": true
+      },
+      {
+        "area_describe": "Memory writes for user style preferences may overwrite or conflict, reducing consistency.",
+        "simple": true,
+        "medium": true,
+        "complete": true
+      }
+    ],
+    "readability": {
+      "simple": {
+        "score": 92,
+        "reasoning": "Short bullet-style instructions with minimal jargon make this version easy for almost any reader."
+      },
+      "medium": {
+        "score": 82,
+        "reasoning": "Adds moderate technical detail and longer sentences, slightly lowering accessibility but still understandable."
+      },
+      "complete": {
+        "score": 70,
+        "reasoning": "Dense step descriptions and conditional logic require more focus and some technical literacy."
+      }
+    },
+    "executability": {
+      "simple": {
+        "score": 65,
+        "reasoning": "This version omits key implementation specifics like file handling, address extraction logic, and error paths, so an agent may stall."
+      },
+      "medium": {
+        "score": 85,
+        "reasoning": "This version supplies enough detail for common cases but still leaves edge-cases such as unusual attachment formats ambiguous."
+      },
+      "complete": {
+        "score": 95,
+        "reasoning": "This version covers attachment vs body detection, deduping addresses, subject-line composition, and escalation criteria, giving an agent clear, runnable directives."
+      }
+    }
+  },
+  "memory": {
+    "areas": [
+      {
+        "description": "Preferred tone, bullet punctuation and length for recaps.",
+        "derivation": "Learned from user edits captured in the email thread or manual corrections when the agent pauses.",
+        "how_improved": "Future recaps match the user's style automatically, reducing manual edits.",
+        "risks": "Incorrectly attributing edits to style rather than content could lock in an unwanted tone."
+      },
+      {
+        "description": "Mapping between recurring meeting titles and confirmed attendee lists.",
+        "derivation": "Extracted each time the human confirms or corrects the recipient list.",
+        "how_improved": "Eliminates repeated prompts for the attendee list on future runs of the same meeting series.",
+        "risks": "Outdated recipient lists could email former attendees or miss new ones."
+      },
+      {
+        "description": "Common decision/action item keywords that matter most to the team.",
+        "derivation": "Aggregated from repeated transcripts and user feedback on what was missing or extraneous in bullets.",
+        "how_improved": "Improves summariser prompt, increasing relevance of the three bullets.",
+        "risks": "May bias summaries toward historic patterns and miss novel but important points."
+      }
+    ]
+  }
+}
