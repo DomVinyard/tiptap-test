@@ -6,6 +6,12 @@ import { formatDistanceToNow } from 'date-fns'
 
 const experiments = [
   {
+    id: 'ambiguity-checker',
+    title: 'Ambiguity Checker',
+    description: 'An analysis tool for detecting and resolving ambiguities in prompts.',
+    date: '2025-06-28',
+  },
+  {
     id: 'sample-assignments',
     title: 'Sauna Sample Assignments',
     description:
